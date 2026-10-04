@@ -1,4 +1,6 @@
 import { setupAnalytics } from "@midday/events/server";
+import { createClient } from "@midday/supabase/server";
+import { isLocalBackend } from "@midday/utils/backend";
 import {
   createSafeActionClient,
   DEFAULT_SERVER_ERROR_MESSAGE,
@@ -60,9 +62,13 @@ export const authActionClient = actionClientWithMeta
     const queryClient = getQueryClient();
     const user = await queryClient.fetchQuery(trpc.user.me.queryOptions());
 
-    const session = await getFreshSession();
+    const session = isLocalBackend() ? await getFreshSession() : null;
+    const supabase = isLocalBackend() ? null : await createClient();
 
-    if (!user || !session || user.id !== session.user.id) {
+    if (
+      !user ||
+      (isLocalBackend() && (!session || user.id !== session.user.id))
+    ) {
       throw new Error("Unauthorized");
     }
 
@@ -75,6 +81,7 @@ export const authActionClient = actionClientWithMeta
     return next({
       ctx: {
         session,
+        supabase,
         analytics,
         user,
         teamId: user.teamId,

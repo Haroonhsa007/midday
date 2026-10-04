@@ -75,3 +75,20 @@ extraction provider. External AI providers cannot fetch localhost MinIO URLs, so
 local extraction requires a reachable tunnel URL; ordinary storage uploads,
 downloads, and exports work on localhost. R2 uses the account S3 endpoint with
 region `auto` and public asset custom domains.
+### Production storage
+
+Use S3-compatible storage credentials on the API and worker. Set public avatar/app
+bucket URLs and `NEXT_PUBLIC_STORAGE_PUBLIC_HOSTS` to the public hostnames so image
+loaders preserve those URLs. Public hosts are comma-separated and may include a port.
+For R2, configure bucket CORS for the deployed dashboard origin:
+
+```json
+[{"AllowedOrigins":["https://app.midday.ai"],"AllowedMethods":["GET","PUT","HEAD"],"AllowedHeaders":["content-type","content-disposition"],"ExposeHeaders":["ETag"],"MaxAgeSeconds":3600}]
+```
+
+Local MinIO permits `http://localhost:3001` through Compose. Browser uploads use a
+single presigned PUT with progress; interrupted uploads must be restarted. The API
+checks ownership, content type and actual size before registering completed uploads.
+Vault uploads default to 100 MiB (`STORAGE_MAX_UPLOAD_BYTES_VAULT` overrides this);
+avatars and app images are limited to 5 MiB. Historical production bucket limits
+were unavailable, so these are explicit replacement defaults.

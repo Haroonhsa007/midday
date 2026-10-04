@@ -15,6 +15,7 @@ import {
   getShortLinkByShortId,
 } from "@midday/db/queries";
 import { createSignedUrl } from "@midday/storage";
+import { isLocalBackend } from "@midday/utils/backend";
 
 export const shortLinksRouter = createTRPCRouter({
   createForUrl: protectedProcedure
@@ -50,16 +51,19 @@ export const shortLinksRouter = createTRPCRouter({
         throw new Error("Document not found");
       }
 
-      // First create the signed URL for the file
+      // Return a short-lived direct URL for callers, but persist only the object key.
       const key = assertStorageTeamKey(teamId!, document.pathTokens ?? []);
       const url = await createSignedUrl("vault", key, {
-        expiresIn: input.expireIn,
+        expiresIn: isLocalBackend() ? 60 : input.expireIn,
         download: true,
       });
 
-      // Then create a short link for the signed URL
+      // The short link owns its expiry; each resolution creates a fresh signature.
       const result = await createShortLink(db, {
-        url: url,
+        url: isLocalBackend() ? `storage://vault/${key}` : url,
+        ...(isLocalBackend()
+          ? { bucket: "vault" as const, objectKey: key }
+          : {}),
         teamId: teamId!,
         userId: session.user.id,
         type: "download",
@@ -87,6 +91,19 @@ export const shortLinksRouter = createTRPCRouter({
   get: publicProcedure
     .input(getShortLinkSchema)
     .query(async ({ ctx: { db }, input }) => {
-      return getShortLinkByShortId(db, input.shortId);
+      const link = await getShortLinkByShortId(db, input.shortId);
+      if (
+        !link ||
+        (link.expiresAt && new Date(link.expiresAt).getTime() <= Date.now())
+      )
+        return null;
+      if (!isLocalBackend() || !link.objectKey) return link;
+      if (link.bucket !== "vault") return null;
+      const key = assertStorageTeamKey(link.teamId, link.objectKey);
+      const url = await createSignedUrl("vault", key, {
+        expiresIn: 60,
+        download: true,
+      });
+      return { ...link, url };
     }),
 });

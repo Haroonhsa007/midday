@@ -18,7 +18,8 @@
     "@aws-sdk/lib-storage": "3.1146.0",
     "zod": "4.3.6",
     "@midday/utils": "workspace:*",
-    "@midday/db": "workspace:*"
+    "@midday/db": "workspace:*",
+    "@midday/supabase": "workspace:*"
   },
   "devDependencies": {
     "@types/bun": "1.3.11",

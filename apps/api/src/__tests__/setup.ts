@@ -783,6 +783,20 @@ export const mocks = {
   signedUrl: mock(() =>
     Promise.resolve("https://example.com/signed"),
   ) as MockFn,
+  createSignedUploadUrl: mock(() =>
+    Promise.resolve({
+      url: "http://localhost:9000/upload",
+      method: "PUT",
+      headers: { "Content-Type": "application/pdf" },
+    }),
+  ) as MockFn,
+  storageHead: mock(() => Promise.resolve(null)) as MockFn,
+  storagePublicUrl: mock(
+    (bucket: string, key: string) => `http://localhost:9000/${bucket}/${key}`,
+  ) as MockFn,
+  upsertDocumentForObject: mock(() =>
+    Promise.resolve({ id: "document-id" }),
+  ) as MockFn,
   removeStorage: mock(() => Promise.resolve()) as MockFn,
   deleteDocumentsByNames: mock(() => Promise.resolve([])) as MockFn,
   formatAmountValue: mock(
@@ -912,6 +926,7 @@ const dbQueriesMock = new Proxy(
     updateInbox: mocks.updateInbox,
     deleteInbox: mocks.deleteInbox,
     deleteDocumentsByNames: mocks.deleteDocumentsByNames,
+    upsertDocumentForObject: mocks.upsertDocumentForObject,
     deleteInboxMany: mocks.deleteInboxMany,
     getInboxByStatus: mocks.getInboxByStatus,
     getInboxSearch: mocks.getInboxSearch,
@@ -1183,6 +1198,9 @@ mock.module("@midday/cache/api-key-cache", () => ({
 // Mock server storage while keeping key authorization real.
 mock.module("@midday/storage", () => ({
   createSignedUrl: mocks.signedUrl,
+  createSignedUploadUrl: mocks.createSignedUploadUrl,
+  head: mocks.storageHead,
+  getPublicUrl: mocks.storagePublicUrl,
   remove: mocks.removeStorage,
   download: mock(() => Promise.resolve(null)),
   getStream: mock(() => Promise.resolve(null)),
@@ -1283,6 +1301,18 @@ mock.module("@midday/invoice", () => ({
       }),
     ),
   ),
+}));
+
+mock.module("@api/services/supabase", () => ({
+  createClient: mock(async () => ({})),
+  createAdminClient: mock(async () => ({
+    auth: {
+      admin: {
+        deleteUser: (...args: unknown[]) =>
+          mocks.supabaseAdminDeleteUser(...args),
+      },
+    },
+  })),
 }));
 
 mock.module("@api/services/storage", () => ({

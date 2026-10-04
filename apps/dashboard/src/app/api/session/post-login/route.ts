@@ -1,6 +1,7 @@
-import { auth } from "@midday/auth/server";
+import { getAuth } from "@midday/auth/server";
 import { LogEvents } from "@midday/events/events";
 import { setupAnalytics } from "@midday/events/server";
+import { isLocalBackend } from "@midday/utils/backend";
 import { sanitizeRedirectPath } from "@midday/utils/sanitize-redirect";
 import { addSeconds, addYears } from "date-fns";
 import { cookies, headers } from "next/headers";
@@ -13,6 +14,8 @@ import { getUrl } from "@/utils/environment";
 import { isBlockedNewUser } from "@/utils/new-user-gate";
 
 export async function GET(req: NextRequest) {
+  if (!isLocalBackend()) return new Response("Not found", { status: 404 });
+  const auth = await getAuth();
   const cookieStore = await cookies();
   const requestUrl = new URL(req.url);
   const origin = getUrl();

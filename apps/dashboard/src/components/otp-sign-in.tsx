@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { authClient } from "@midday/auth/client";
+import { createClient } from "@midday/supabase/client";
 import { cn } from "@midday/ui/cn";
 import {
   Form,
@@ -14,6 +15,7 @@ import { Input } from "@midday/ui/input";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@midday/ui/input-otp";
 import { Spinner } from "@midday/ui/spinner";
 import { SubmitButton } from "@midday/ui/submit-button";
+import { isLocalBackend } from "@midday/utils/backend";
 import { useSearchParams } from "next/navigation";
 import { useAction } from "next-safe-action/hooks";
 import { useState } from "react";
@@ -56,10 +58,12 @@ export function OTPSignIn({ className }: Props) {
 
     setEmail(email);
 
-    const { error } = await authClient.emailOtp.sendVerificationOtp({
-      email,
-      type: "sign-in",
-    });
+    const { error } = isLocalBackend()
+      ? await authClient.emailOtp.sendVerificationOtp({
+          email,
+          type: "sign-in",
+        })
+      : await createClient().auth.signInWithOtp({ email });
     if (error) {
       form.setError("email", {
         message: error.message ?? "Unable to send sign-in code",
@@ -80,7 +84,9 @@ export function OTPSignIn({ className }: Props) {
     verifyOtp.execute({
       token,
       email,
-      redirectTo: `/api/session/post-login?provider=otp&return_to=${encodeURIComponent(searchParams.get("return_to") || "")}`,
+      redirectTo: isLocalBackend()
+        ? `/api/session/post-login?provider=otp&return_to=${encodeURIComponent(searchParams.get("return_to") || "")}`
+        : `/${searchParams.get("return_to") || ""}`,
     });
   }
 

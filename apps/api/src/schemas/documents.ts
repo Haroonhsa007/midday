@@ -1,4 +1,5 @@
 import { z } from "@hono/zod-openapi";
+import { isLocalBackend } from "@midday/utils/backend";
 
 export const getDocumentsSchema = z
   .object({
@@ -130,7 +131,14 @@ export const processDocumentSchema = z.array(
 
 export const signedUrlSchema = z.object({
   filePath: z.string(),
-  expireIn: z.number().int().min(1).max(604800),
+  expireIn: z
+    .number()
+    .int()
+    .min(1)
+    .refine(
+      (seconds) => !isLocalBackend() || seconds <= 604800,
+      "Local storage URLs expire within seven days",
+    ),
 });
 
 export const signedUrlsSchema = z.array(z.string());

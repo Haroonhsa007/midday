@@ -4,7 +4,9 @@ import type { Job } from "bullmq";
 import type { ExportTransactionsPayload } from "../../schemas/transactions";
 
 const connectionString = process.env.TEST_DATABASE_URL;
-const enabled = Boolean(connectionString && process.env.STORAGE_ENDPOINT);
+const enabled =
+  process.env.NEXT_PUBLIC_BACKEND_PROVIDER === "local" &&
+  Boolean(connectionString && process.env.STORAGE_ENDPOINT);
 
 describe.skipIf(!enabled)(
   "Export storage and document mirror integration",

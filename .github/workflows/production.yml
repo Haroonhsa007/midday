@@ -86,7 +86,7 @@ jobs:
 
       - name: Setup test database schema
         run: |
-          DATABASE_MIGRATION_URL=postgres://postgres:postgres@localhost:5433/midday_test DATABASE_SSL=disable bun run src/migrate.ts
+          NEXT_PUBLIC_BACKEND_PROVIDER=local DATABASE_MIGRATION_URL=postgres://postgres:postgres@localhost:5433/midday_test DATABASE_SSL=disable bun run src/migrate.ts
         working-directory: packages/db
 
       - name: Lint

@@ -2,6 +2,7 @@
 
 import { authClient } from "@midday/auth/client";
 import { LogEvents } from "@midday/events/events";
+import { createClient } from "@midday/supabase/client";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,6 +24,7 @@ import {
 } from "@midday/ui/card";
 import { Input } from "@midday/ui/input";
 import { Label } from "@midday/ui/label";
+import { isLocalBackend } from "@midday/utils/backend";
 import { useOpenPanel } from "@openpanel/nextjs";
 import { useMutation } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
@@ -40,7 +42,8 @@ export function DeleteAccount() {
       onSuccess: async () => {
         track(LogEvents.AccountDeleted.name);
         clearAccessToken();
-        await authClient.signOut().catch(() => {});
+        if (isLocalBackend()) await authClient.signOut().catch(() => {});
+        else await createClient().auth.signOut();
         await redirectAfterAccountDeletion();
       },
     }),

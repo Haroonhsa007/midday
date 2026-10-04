@@ -28,6 +28,8 @@ const config = {
     loaderFile: "./image-loader.ts",
     qualities: [80, 100],
     remotePatterns: [
+      { protocol: "http", hostname: "localhost" },
+      { protocol: "http", hostname: "127.0.0.1" },
       {
         protocol: "https",
         hostname: "**",

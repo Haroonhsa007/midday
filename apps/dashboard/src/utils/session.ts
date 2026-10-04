@@ -1,4 +1,6 @@
 import { authClient } from "@midday/auth/client";
+import { createClient } from "@midday/supabase/client";
+import { isLocalBackend } from "@midday/utils/backend";
 
 let cached: { token: string; expiresAt: number } | null = null;
 let pending: Promise<string | null> | null = null;
@@ -11,8 +13,9 @@ export function clearAccessToken() {
 }
 
 // Better Auth emits this signal for sign-in/out and cross-tab updates.
-authClient.$store.listen("$sessionSignal", clearAccessToken);
-if (typeof window !== "undefined") {
+if (isLocalBackend())
+  authClient.$store.listen("$sessionSignal", clearAccessToken);
+if (isLocalBackend() && typeof window !== "undefined") {
   let sessionId: string | undefined;
   let initialized = false;
   authClient.$store.atoms.session?.subscribe(({ data, isPending }) => {
@@ -30,6 +33,11 @@ if (typeof window !== "undefined") {
 }
 
 export async function getAccessToken(): Promise<string | null> {
+  if (!isLocalBackend())
+    return (
+      (await createClient().auth.getSession()).data.session?.access_token ??
+      null
+    );
   if (cached && cached.expiresAt > Date.now() + 60_000) return cached.token;
   if (pending) return pending;
   const startedAt = revision;

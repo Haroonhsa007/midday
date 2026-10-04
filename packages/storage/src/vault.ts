@@ -1,5 +1,6 @@
 import type { DatabaseOrTransaction } from "@midday/db/client";
 import { upsertDocumentForObject } from "@midday/db/queries";
+import { isLocalBackend } from "@midday/utils/backend";
 import { type Body, upload } from "./index";
 import { assertTeamKey } from "./keys";
 
@@ -18,12 +19,14 @@ export async function uploadVaultObject(
   const info = await upload("vault", key, input.body, {
     contentType: input.contentType,
   });
-  await upsertDocumentForObject(db, {
-    teamId: input.teamId,
-    key,
-    ownerId: input.ownerId,
-    size: info.size,
-    mimetype: input.contentType,
-  });
+  // Existing Supabase installations retain their storage.objects registration trigger.
+  if (isLocalBackend())
+    await upsertDocumentForObject(db, {
+      teamId: input.teamId,
+      key,
+      ownerId: input.ownerId,
+      size: info.size,
+      mimetype: input.contentType,
+    });
   return { path: key };
 }
