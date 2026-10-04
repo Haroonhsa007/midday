@@ -1,4 +1,12 @@
-import { afterAll, beforeEach, describe, expect, mock, test } from "bun:test";
+import {
+  afterAll,
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  mock,
+  test,
+} from "bun:test";
 
 const uploadObject = mock(() =>
   Promise.resolve({ data: { path: "team/file.pdf" }, error: null }),
@@ -35,7 +43,7 @@ const listObjects = mock((path: string) =>
 const signObject = mock(() =>
   Promise.resolve({
     data: { signedUrl: "http://localhost/signed-supabase" },
-    error: null,
+    error: null as unknown,
   }),
 );
 const getBucket = mock(() =>
@@ -67,9 +75,17 @@ const {
   checkStorageHealth,
 } = await import("../index");
 const { uploadVaultObject } = await import("../vault");
+const originalFetch = globalThis.fetch;
+const fetchObject = mock(
+  async () =>
+    new Response("abc", {
+      headers: { "content-type": "application/pdf", "content-length": "3" },
+    }),
+);
 const originalProvider = process.env.NEXT_PUBLIC_BACKEND_PROVIDER;
 const originalUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 beforeEach(() => {
+  globalThis.fetch = fetchObject as unknown as typeof fetch;
   delete process.env.NEXT_PUBLIC_BACKEND_PROVIDER; // Existing deployments default to Supabase.
   process.env.NEXT_PUBLIC_SUPABASE_URL = "http://localhost:54321";
   for (const fn of [
@@ -82,8 +98,12 @@ beforeEach(() => {
     getBucket,
     from,
     upsertDocumentForObject,
+    fetchObject,
   ])
     fn.mockClear();
+});
+afterEach(() => {
+  globalThis.fetch = originalFetch;
 });
 afterAll(() => {
   if (originalProvider === undefined)
@@ -128,6 +148,108 @@ describe("Supabase storage compatibility", () => {
     expect(removeObjects).toHaveBeenCalledWith(["team/file.pdf"]);
     expect(getPublicUrl("avatars", "user/a #.png")).toBe(
       "http://localhost:54321/storage/v1/object/public/avatars/user/a%20%23.png",
+    );
+  });
+  test("stream signs through SDK and returns the upstream body without downloading or reading it", async () => {
+    const pull = mock(() => {});
+    const body = new ReadableStream<Uint8Array>({ pull }, { highWaterMark: 0 });
+    const response = new Response(body, {
+      headers: {
+        "content-type": "application/pdf",
+        "content-length": "104857600",
+      },
+    });
+    const readBlob = mock(() => {
+      throw new Error("Must not buffer Blob");
+    });
+    const readBytes = mock(() => {
+      throw new Error("Must not buffer bytes");
+    });
+    response.blob = readBlob;
+    response.arrayBuffer = readBytes;
+    fetchObject.mockImplementationOnce(async () => response);
+    const result = await getStream("vault", "team/large.pdf");
+    expect(signObject).toHaveBeenCalledWith("team/large.pdf", 60, {
+      download: undefined,
+    });
+    expect(fetchObject).toHaveBeenCalledWith(
+      "http://localhost/signed-supabase",
+    );
+    expect(downloadObject).not.toHaveBeenCalled();
+    expect(result?.body).toBe(response.body);
+    expect(result?.contentType).toBe("application/pdf");
+    expect(result?.size).toBe(104857600);
+    expect(response.bodyUsed).toBe(false);
+    expect(pull).not.toHaveBeenCalled();
+    expect(readBlob).not.toHaveBeenCalled();
+    expect(readBytes).not.toHaveBeenCalled();
+    await result?.body.cancel();
+  });
+  test("stream missing-object responses return null and release failed HTTP bodies", async () => {
+    signObject.mockImplementationOnce(async () => ({
+      data: null as never,
+      error: { statusCode: "404", message: "Object not found" },
+    }));
+    expect(await getStream("vault", "team/missing.pdf")).toBeNull();
+    expect(fetchObject).not.toHaveBeenCalled();
+    const cancel = mock(() => {});
+    const body = new ReadableStream<Uint8Array>(
+      { cancel },
+      { highWaterMark: 0 },
+    );
+    fetchObject.mockImplementationOnce(
+      async () => new Response(body, { status: 404 }),
+    );
+    expect(await getStream("vault", "team/deleted.pdf")).toBeNull();
+    expect(cancel).toHaveBeenCalledTimes(1);
+    expect(downloadObject).not.toHaveBeenCalled();
+  });
+  test("stream propagates signing, network and non-404 HTTP failures", async () => {
+    signObject.mockImplementationOnce(async () => ({
+      data: null as never,
+      error: { statusCode: "403", message: "Forbidden" },
+    }));
+    await expect(getStream("vault", "team/private.pdf")).rejects.toMatchObject({
+      statusCode: "403",
+    });
+    expect(fetchObject).not.toHaveBeenCalled();
+    const failure = new Error("Network unavailable");
+    fetchObject.mockImplementationOnce(async () => {
+      throw failure;
+    });
+    await expect(getStream("vault", "team/file.pdf")).rejects.toBe(failure);
+    const cancel = mock(() => {});
+    fetchObject.mockImplementationOnce(
+      async () =>
+        new Response(
+          new ReadableStream<Uint8Array>({ cancel }, { highWaterMark: 0 }),
+          { status: 503 },
+        ),
+    );
+    await expect(getStream("vault", "team/file.pdf")).rejects.toThrow(
+      "Supabase storage stream failed (503)",
+    );
+    expect(cancel).toHaveBeenCalledTimes(1);
+    expect(downloadObject).not.toHaveBeenCalled();
+  });
+  test("stream metadata leaves absent/invalid lengths unknown and preserves zero", async () => {
+    for (const length of [undefined, "invalid", "9007199254740992", "0"]) {
+      fetchObject.mockImplementationOnce(
+        async () =>
+          new Response(new Uint8Array(), {
+            headers: length === undefined ? {} : { "content-length": length },
+          }),
+      );
+      const result = await getStream("vault", "team/empty.pdf");
+      expect(result?.size).toBe(length === "0" ? 0 : undefined);
+      expect(result?.contentType).toBeUndefined();
+      await result?.body.cancel();
+    }
+    fetchObject.mockImplementationOnce(
+      async () => new Response(null, { status: 204 }),
+    );
+    await expect(getStream("vault", "team/no-body.pdf")).rejects.toThrow(
+      "Supabase storage response has no body",
     );
   });
   test("signed URLs use Supabase expiry/download options; local PUT endpoint is unavailable", async () => {

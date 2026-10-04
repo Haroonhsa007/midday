@@ -54,10 +54,29 @@ export async function download(
   return data;
 }
 export async function getStream(bucket: Bucket, key: string) {
-  const blob = await download(bucket, key);
-  return blob
-    ? { body: blob.stream(), contentType: blob.type, size: blob.size }
-    : null;
+  let url: string;
+  try {
+    url = await createSignedUrl(bucket, key, { expiresIn: 60 });
+  } catch (error) {
+    if (isMissing(error)) return null;
+    throw error;
+  }
+  // SDK download() materializes a Blob. Fetch the signed URL directly so large
+  // hosted files retain streaming/backpressure without forwarding service keys.
+  const response = await fetch(url);
+  if (!response.ok) {
+    await response.body?.cancel().catch(() => {});
+    if (response.status === 404) return null;
+    throw new Error(`Supabase storage stream failed (${response.status})`);
+  }
+  if (!response.body) throw new Error("Supabase storage response has no body");
+  const length = response.headers.get("content-length");
+  const size = length && /^\d+$/.test(length) ? Number(length) : undefined;
+  return {
+    body: response.body,
+    contentType: response.headers.get("content-type") ?? undefined,
+    size: size !== undefined && Number.isSafeInteger(size) ? size : undefined,
+  };
 }
 export async function head(
   bucket: Bucket,
