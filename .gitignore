@@ -92,3 +92,10 @@ dist-ssr
 
 # Toolpick embedding cache (auto-generated on first boot)
 .toolpick-cache.json
+
+# Lead/dev agent context (local only)
+context/
+
+# Browser test artifacts
+/test-results/
+playwright-report/
