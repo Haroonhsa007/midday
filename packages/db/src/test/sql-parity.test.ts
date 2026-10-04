@@ -356,7 +356,7 @@ describe.skipIf(!isTestDatabaseAvailable())(
 
     test("migration installs all eleven parity triggers", async () => {
       const result = await db.execute(
-        sql`SELECT count(*)::integer AS count FROM pg_trigger t JOIN pg_class c ON c.oid = t.tgrelid JOIN pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = 'public' AND NOT t.tgisinternal`,
+        sql`SELECT count(*)::integer AS count FROM pg_trigger t JOIN pg_class c ON c.oid = t.tgrelid JOIN pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = 'public' AND NOT t.tgisinternal AND t.tgname IN ('generate_category_slug', 'trigger_update_transactions_category', 'trigger_calculate_transaction_base_amount_before_insert', 'trigger_calculate_bank_account_base_balance_before_insert', 'trigger_calculate_bank_account_base_balance_before_update', 'trigger_calculate_inbox_base_amount_before_update', 'enrich_transaction', 'on_updated_transaction_category', 'check_recurring_transactions', 'documents_update_fts', 'invoices_set_updated_at')`,
       );
       expect(result.rows[0]!.count).toBe(11);
     });
