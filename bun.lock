@@ -105,6 +105,7 @@
         "@midday/location": "workspace:*",
         "@midday/mcp-apps": "workspace:*",
         "@midday/plans": "workspace:*",
+        "@midday/storage": "workspace:*",
         "@midday/supabase": "workspace:*",
         "@midday/trpc": "workspace:*",
         "@midday/ui": "workspace:*",
@@ -318,6 +319,7 @@
         "@midday/email": "workspace:*",
         "@midday/events": "workspace:*",
         "@midday/jobs": "workspace:*",
+        "@midday/utils": "workspace:*",
         "@trigger.dev/sdk": "catalog:",
         "better-auth": "1.7.7",
         "drizzle-orm": "0.45.1",
@@ -544,6 +546,7 @@
         "@midday/cache": "workspace:*",
         "@midday/db": "workspace:*",
         "@midday/storage": "workspace:*",
+        "@midday/utils": "workspace:*",
       },
     },
     "packages/import": {
@@ -716,6 +719,7 @@
         "@aws-sdk/lib-storage": "3.1146.0",
         "@aws-sdk/s3-request-presigner": "3.1146.0",
         "@midday/db": "workspace:*",
+        "@midday/supabase": "workspace:*",
         "@midday/utils": "workspace:*",
         "zod": "4.3.6",
       },
@@ -3444,7 +3448,7 @@
 
     "jpeg-js": ["jpeg-js@0.4.4", "", {}, "sha512-WZzeDOEtTOBK4Mdsar0IqEU5sMr3vSV2RqkAIzUEV2BHnUfKGyswWFPFwK5EeDo93K3FohSHbLAjj0s1Wzd+dg=="],
 
-    "js-base64": ["js-base64@3.7.8", "", {}, "sha512-hNngCeKxIUQiEUN3GPJOkz4wF/YvdUdbNL9hsBcMQTkKzboD7T/q3OYOuuPZLUE6dBxSGpwhk5mwuDud7JVAow=="],
+    "js-base64": ["js-base64@3.9.4", "", {}, "sha512-PtOMXpEGuP0RRiRXsjzHzl44dMHxSu2CPvAhinupR1tBa88me+1DPqsobl7eupn5UukjLkln1ZnAOAOXOrYG0Q=="],
 
     "js-tiktoken": ["js-tiktoken@1.0.21", "", { "dependencies": { "base64-js": "^1.5.1" } }, "sha512-biOj/6M5qdgx5TKjDnFT1ymSpM5tbd3ylwDtrQvFQSu0Z7bBYko2dF+W/aUkXUPuk6IVpRxk/3Q2sHOzGlS36g=="],
 

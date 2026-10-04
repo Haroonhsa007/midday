@@ -1,3 +1,4 @@
+import { createClient } from "@midday/supabase/server";
 import { Button } from "@midday/ui/button";
 import {
   Card,
@@ -7,21 +8,23 @@ import {
   CardHeader,
   CardTitle,
 } from "@midday/ui/card";
+import { isLocalBackend } from "@midday/utils/backend";
 import Link from "next/link";
-import { getFreshSession } from "@/lib/auth";
+import { LocalMfaSettingsList } from "./mfa-settings-list.local";
 import { UnenrollMFA } from "./unenroll-mfa";
 
-export async function MfaSettingsList() {
-  const session = await getFreshSession();
-  const hasMfaFactors = !!session?.user.twoFactorEnabled;
+async function SupabaseMfaSettingsList() {
+  const supabase = await createClient();
+  const { data } = await supabase.auth.mfa.listFactors();
+  const hasMfaFactors = data?.all && data.all.length > 0;
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Multi-factor authentication</CardTitle>
         <CardDescription>
-          Add an additional layer of security to your account by requiring an
-          authenticator code after signing in.
+          Add an additional layer of security to your account by requiring more
+          than just a password to sign in.
         </CardDescription>
       </CardHeader>
 
@@ -38,11 +41,17 @@ export async function MfaSettingsList() {
       <CardFooter className="flex justify-between">
         <div />
         <Link href="?add=device">
-          <Button>
-            {hasMfaFactors ? "Replace authenticator" : "Enable MFA"}
-          </Button>
+          <Button>{hasMfaFactors ? "Add new device" : "Enable MFA"}</Button>
         </Link>
       </CardFooter>
     </Card>
+  );
+}
+
+export async function MfaSettingsList() {
+  return isLocalBackend() ? (
+    <LocalMfaSettingsList />
+  ) : (
+    <SupabaseMfaSettingsList />
   );
 }

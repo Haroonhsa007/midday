@@ -1,13 +1,20 @@
 "use client";
 
-import { authClient } from "@midday/auth/client";
 import { isDesktopApp } from "@midday/desktop-client/platform";
-import { toast } from "@midday/ui/use-toast";
+import { createClient } from "@midday/supabase/client";
+import { isLocalBackend } from "@midday/utils/backend";
+import type { Provider } from "@supabase/supabase-js";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { getUrl } from "@/utils/environment";
+import { useLocalOAuthSignIn } from "./use-oauth-sign-in.local";
 
-export type OAuthProvider = "google" | "apple" | "github" | "microsoft";
+export type OAuthProvider =
+  | "google"
+  | "apple"
+  | "github"
+  | "azure"
+  | "microsoft";
 
 type ProviderConfig = {
   name: string;
@@ -18,7 +25,10 @@ type ProviderConfig = {
   supportsReturnTo: boolean;
 };
 
-const OAUTH_PROVIDERS: Record<OAuthProvider, ProviderConfig> = {
+const OAUTH_PROVIDERS: Record<
+  Exclude<OAuthProvider, "microsoft">,
+  ProviderConfig
+> = {
   google: {
     name: "Google",
     icon: "Google",
@@ -38,7 +48,7 @@ const OAUTH_PROVIDERS: Record<OAuthProvider, ProviderConfig> = {
     variant: "secondary",
     supportsReturnTo: true,
   },
-  microsoft: {
+  azure: {
     name: "Microsoft",
     icon: "Microsoft",
     scopes: "email profile openid",
@@ -47,39 +57,50 @@ const OAUTH_PROVIDERS: Record<OAuthProvider, ProviderConfig> = {
   },
 };
 
-export function useOAuthSignIn(provider: OAuthProvider) {
+function useSupabaseOAuthSignIn(provider: OAuthProvider) {
+  const supabaseProvider = provider === "microsoft" ? "azure" : provider;
   const [isLoading, setLoading] = useState(false);
+  const supabase = createClient();
   const searchParams = useSearchParams();
   const returnTo = searchParams.get("return_to");
-  const config = OAUTH_PROVIDERS[provider];
+  const config = OAUTH_PROVIDERS[supabaseProvider];
 
   const handleSignIn = async () => {
-    if (isDesktopApp()) {
-      toast({
-        title: "Use email code to sign in on desktop (OAuth coming soon)",
-        variant: "error",
-      });
-      return;
-    }
     setLoading(true);
-    const callbackURL = new URL("/api/session/post-login", getUrl());
-    callbackURL.searchParams.set("provider", provider);
-    if (returnTo) callbackURL.searchParams.set("return_to", returnTo);
-    try {
-      const { error } = await authClient.signIn.social({
-        provider,
-        callbackURL: callbackURL.toString(),
-        errorCallbackURL: "/login?error=oauth",
-      });
-      if (error)
-        toast({
-          title: error.message ?? "Unable to sign in",
-          variant: "error",
-        });
-    } finally {
-      setLoading(false);
+
+    const redirectTo = new URL("/api/auth/callback", getUrl());
+    redirectTo.searchParams.append("provider", supabaseProvider);
+
+    const isDesktop = isDesktopApp();
+
+    if (isDesktop) {
+      redirectTo.searchParams.append("client", "desktop");
+    } else if (config.supportsReturnTo && returnTo) {
+      redirectTo.searchParams.append("return_to", returnTo);
     }
+
+    const queryParams = isDesktop
+      ? { ...config.queryParams, client: "desktop" }
+      : config.queryParams;
+
+    await supabase.auth.signInWithOAuth({
+      provider: supabaseProvider as Provider,
+      options: {
+        redirectTo: redirectTo.toString(),
+        scopes: config.scopes,
+        queryParams,
+      },
+    });
+
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
   };
 
   return { handleSignIn, isLoading, config };
 }
+
+// The backend is fixed for the lifetime of a browser build; select the hook before rendering.
+export const useOAuthSignIn = isLocalBackend()
+  ? useLocalOAuthSignIn
+  : useSupabaseOAuthSignIn;

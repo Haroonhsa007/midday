@@ -1,4 +1,11 @@
-import { afterAll, beforeEach, describe, expect, test } from "bun:test";
+import {
+  afterAll,
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  test,
+} from "bun:test";
 import { eq } from "drizzle-orm";
 import { createUserProfile, deleteUser } from "../queries/users";
 import {
@@ -20,7 +27,16 @@ describe.skipIf(!isTestDatabaseAvailable())(
   "Auth profile and deletion tenant isolation",
   () => {
     const db = getTestDatabase();
-    beforeEach(cleanDatabase);
+    const originalProvider = process.env.NEXT_PUBLIC_BACKEND_PROVIDER;
+    beforeEach(async () => {
+      process.env.NEXT_PUBLIC_BACKEND_PROVIDER = "local";
+      await cleanDatabase();
+    });
+    afterEach(() => {
+      if (originalProvider === undefined)
+        delete process.env.NEXT_PUBLIC_BACKEND_PROVIDER;
+      else process.env.NEXT_PUBLIC_BACKEND_PROVIDER = originalProvider;
+    });
     afterAll(closeDatabase);
     test("profile creation is idempotent; deletion cascades auth state and preserves shared teams", async () => {
       const userId = crypto.randomUUID();

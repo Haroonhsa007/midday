@@ -24,7 +24,8 @@
     "react": "catalog:",
     "server-only": "0.0.1",
     "jose": "catalog:",
-    "drizzle-orm": "0.45.1"
+    "drizzle-orm": "0.45.1",
+    "@midday/utils": "workspace:*"
   },
   "devDependencies": {
     "typescript": "catalog:",

@@ -16,6 +16,7 @@
     "@midday/banking": "workspace:*",
     "@midday/cache": "workspace:*",
     "@midday/db": "workspace:*",
-    "@midday/storage": "workspace:*"
+    "@midday/storage": "workspace:*",
+    "@midday/utils": "workspace:*"
   }
 }

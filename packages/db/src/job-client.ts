@@ -15,7 +15,7 @@ const isDevelopment = process.env.NODE_ENV === "development";
 export const createJobDb = () => {
   const jobPool = new Pool({
     connectionString: process.env.DATABASE_PRIMARY_POOLER_URL!,
-    ssl: getSslConfig(),
+    ...(process.env.DATABASE_SSL ? { ssl: getSslConfig() } : {}),
     max: 1,
     idleTimeoutMillis: isDevelopment ? 5000 : 60000,
     connectionTimeoutMillis: 15000,

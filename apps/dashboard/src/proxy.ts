@@ -1,4 +1,5 @@
-import { auth } from "@midday/auth/server";
+import { updateSession } from "@midday/supabase/middleware";
+import { isLocalBackend } from "@midday/utils/backend";
 import { type NextRequest, NextResponse } from "next/server";
 import { createI18nMiddleware } from "next-international/middleware";
 
@@ -11,17 +12,16 @@ const I18nMiddleware = createI18nMiddleware({
 });
 
 export async function proxy(request: NextRequest) {
-  const response = I18nMiddleware(request);
-  const session = await auth.api.getSession({
-    headers: request.headers,
-    query: { disableCookieCache: true },
-  });
-  const isAuthenticated = !!session;
+  if (isLocalBackend())
+    return (await import("@/lib/local-auth-proxy")).proxy(request);
+  const { response, isAuthenticated, supabase } = await updateSession(
+    request,
+    I18nMiddleware(request),
+  );
 
   const nextUrl = request.nextUrl;
 
-  const pathnameLocale =
-    nextUrl.pathname.split("/", 2)?.[1] === "en" ? "en" : undefined;
+  const pathnameLocale = nextUrl.pathname.split("/", 2)?.[1];
 
   const pathnameWithoutLocale = pathnameLocale
     ? nextUrl.pathname.slice(pathnameLocale.length + 1)
@@ -30,7 +30,7 @@ export async function proxy(request: NextRequest) {
   const newUrl = new URL(pathnameWithoutLocale || "/", ORIGIN);
 
   const encodedSearchParams = `${newUrl?.pathname?.substring(1)}${
-    nextUrl.search
+    newUrl.search
   }`;
 
   if (
@@ -54,22 +54,29 @@ export async function proxy(request: NextRequest) {
   }
 
   if (isAuthenticated) {
-    if (
-      session.user.twoFactorEnabled &&
-      session.session.aal !== "aal2" &&
-      newUrl.pathname !== "/mfa/verify"
-    ) {
-      const mfaUrl = new URL("/mfa/verify", ORIGIN);
-      if (encodedSearchParams)
-        mfaUrl.searchParams.set("return_to", encodedSearchParams);
-      return NextResponse.redirect(mfaUrl);
-    }
     if (newUrl.pathname !== "/onboarding" && newUrl.pathname !== "/teams") {
       const inviteCodeMatch = newUrl.pathname.startsWith("/teams/invite/");
 
       if (inviteCodeMatch) {
         return NextResponse.redirect(`${ORIGIN}${request.nextUrl.pathname}`);
       }
+    }
+
+    const { data: mfaData } =
+      await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    if (
+      mfaData &&
+      mfaData.nextLevel === "aal2" &&
+      mfaData.nextLevel !== mfaData.currentLevel &&
+      newUrl.pathname !== "/mfa/verify"
+    ) {
+      const mfaUrl = new URL("/mfa/verify", ORIGIN);
+
+      if (encodedSearchParams) {
+        mfaUrl.searchParams.append("return_to", encodedSearchParams);
+      }
+
+      return NextResponse.redirect(mfaUrl);
     }
   }
 

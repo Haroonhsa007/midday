@@ -2451,6 +2451,8 @@ export const shortLinks = pgTable(
     id: uuid().defaultRandom().primaryKey().notNull(),
     shortId: text("short_id").notNull(),
     url: text().notNull(),
+    bucket: text(),
+    objectKey: text("object_key"),
     type: text("type"),
     size: numericCasted("size", { precision: 10, scale: 2 }),
     mimeType: text("mime_type"),

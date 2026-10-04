@@ -11,6 +11,7 @@ import { Provider } from "@midday/banking";
 import { checkHealth as checkCacheHealth } from "@midday/cache/health";
 import { checkHealth as checkDbHealth } from "@midday/db/utils/health";
 import { checkStorageHealth } from "@midday/storage";
+import { isLocalBackend } from "@midday/utils/backend";
 import type { Dependency } from "./registry";
 
 // ---------------------------------------------------------------------------
@@ -428,8 +429,7 @@ export function apiDependencies(): Dependency[] {
     databaseProbe(),
     redisCacheProbe(),
     redisQueueProbe(),
-    supabaseProbe(),
-    storageProbe(),
+    isLocalBackend() ? storageProbe() : supabaseProbe(),
     // Tier 2 — Important
     plaidProbe(),
     gocardlessProbe(),
@@ -458,8 +458,7 @@ export function workerDependencies(): Dependency[] {
     // Tier 1 — Core
     databaseProbe(),
     redisQueueProbe(),
-    supabaseProbe(),
-    storageProbe(),
+    isLocalBackend() ? storageProbe() : supabaseProbe(),
     // Tier 2 — Important
     plaidProbe(),
     gocardlessProbe(),

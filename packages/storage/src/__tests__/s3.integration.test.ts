@@ -14,7 +14,9 @@ import {
 } from "../index";
 import { assertTeamKey } from "../keys";
 
-const enabled = Boolean(process.env.STORAGE_ENDPOINT);
+const enabled =
+  process.env.NEXT_PUBLIC_BACKEND_PROVIDER === "local" &&
+  Boolean(process.env.STORAGE_ENDPOINT);
 const prefix = `storage-test-${crypto.randomUUID()}/`;
 // Integration runs are intentionally confined to local infrastructure.
 if (

@@ -1,3 +1,4 @@
+import { isLocalBackend } from "@midday/utils/backend";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import type { Database, DatabaseOrTransaction, primaryDb } from "../client";
 import { authUsers, teams, users, usersOnTeam } from "../schema";
@@ -168,6 +169,8 @@ export const deleteUser = async (db: Database, id: string) =>
       .map((team) => team.teamId);
     if (singleMemberTeams.length)
       await tx.delete(teams).where(inArray(teams.id, singleMemberTeams));
-    await tx.delete(authUsers).where(eq(authUsers.id, id));
+    if (isLocalBackend())
+      await tx.delete(authUsers).where(eq(authUsers.id, id));
+    else await tx.delete(users).where(eq(users.id, id));
     return { id };
   });

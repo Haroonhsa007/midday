@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test } from "bun:test";
+import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { getUserInvites } from "@midday/db/queries";
 import { createCallerFactory } from "../../trpc/init";
 import { userRouter } from "../../trpc/routers/user";
@@ -193,7 +193,18 @@ describe("tRPC: user.switchTeam", () => {
 });
 
 describe("tRPC: user.delete", () => {
+  const originalProvider = process.env.NEXT_PUBLIC_BACKEND_PROVIDER;
+  afterEach(() => {
+    if (originalProvider === undefined)
+      delete process.env.NEXT_PUBLIC_BACKEND_PROVIDER;
+    else process.env.NEXT_PUBLIC_BACKEND_PROVIDER = originalProvider;
+  });
   beforeEach(() => {
+    delete process.env.NEXT_PUBLIC_BACKEND_PROVIDER;
+    mocks.supabaseAdminDeleteUser.mockReset();
+    mocks.supabaseAdminDeleteUser.mockImplementation(() =>
+      Promise.resolve({ data: {}, error: null }),
+    );
     mocks.deleteUser.mockReset();
     mocks.deleteUser.mockImplementation(() =>
       Promise.resolve({ id: "test-user-id" }),
@@ -217,6 +228,7 @@ describe("tRPC: user.delete", () => {
       expect.anything(),
       "test-user-id",
     );
+    expect(mocks.supabaseAdminDeleteUser).toHaveBeenCalledWith("test-user-id");
     expect(mocks.resendContactsRemove).toHaveBeenCalledWith(
       expect.objectContaining({
         email: "test@example.com",
@@ -228,7 +240,8 @@ describe("tRPC: user.delete", () => {
     if (oldAudience === undefined) delete process.env.RESEND_AUDIENCE_ID;
     else process.env.RESEND_AUDIENCE_ID = oldAudience;
   });
-  test("deletes locally without contacting an unconfigured email service", async () => {
+  test("deletes locally without contacting Supabase or an unconfigured email service", async () => {
+    process.env.NEXT_PUBLIC_BACKEND_PROVIDER = "local";
     const oldKey = process.env.RESEND_API_KEY;
     delete process.env.RESEND_API_KEY;
     try {
@@ -236,6 +249,7 @@ describe("tRPC: user.delete", () => {
         id: "test-user-id",
       });
       expect(mocks.resendContactsRemove).not.toHaveBeenCalled();
+      expect(mocks.supabaseAdminDeleteUser).not.toHaveBeenCalled();
     } finally {
       if (oldKey !== undefined) process.env.RESEND_API_KEY = oldKey;
     }

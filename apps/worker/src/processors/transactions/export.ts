@@ -9,6 +9,7 @@ import { triggerJob } from "@midday/job-client";
 import { createSignedUrl } from "@midday/storage";
 import { assertTeamKey } from "@midday/storage/keys";
 import { uploadVaultObject } from "@midday/storage/vault";
+import { isLocalBackend } from "@midday/utils/backend";
 import { getAppUrl } from "@midday/utils/envs";
 import archiver from "archiver";
 import type { Job } from "bullmq";
@@ -237,47 +238,47 @@ export class ExportTransactionsProcessor extends BaseProcessor<ExportTransaction
 
     if (settings.sendEmail && settings.accountantEmail) {
       const expireIn = 7 * 24 * 60 * 60;
-      const signedUrlData = await createSignedUrl(
-        "vault",
-        assertTeamKey(teamId, fullPath),
-        { expiresIn: expireIn, download: true },
-      );
+      const objectKey = assertTeamKey(teamId, fullPath);
 
-      if (signedUrlData) {
-        const shortLink = await createShortLink(getDb(), {
-          url: signedUrlData,
-          teamId,
-          userId,
-          type: "download",
-          fileName,
-          mimeType: "application/zip",
-          expiresAt: new Date(Date.now() + expireIn * 1000).toISOString(),
-        });
+      const shortLink = await createShortLink(getDb(), {
+        url: isLocalBackend()
+          ? `storage://vault/${objectKey}`
+          : await createSignedUrl("vault", objectKey, {
+              expiresIn: expireIn,
+              download: true,
+            }),
+        ...(isLocalBackend() ? { bucket: "vault" as const, objectKey } : {}),
+        teamId,
+        userId,
+        type: "download",
+        fileName,
+        mimeType: "application/zip",
+        expiresAt: new Date(Date.now() + expireIn * 1000).toISOString(),
+      });
 
-        if (shortLink) {
-          const downloadLink = `${getAppUrl()}/s/${shortLink.shortId}`;
+      if (shortLink) {
+        const downloadLink = `${getAppUrl()}/s/${shortLink.shortId}`;
 
-          this.logger.debug("Short link created for export", { downloadLink });
+        this.logger.debug("Short link created for export", { downloadLink });
 
-          try {
-            await triggerJob(
-              "notification",
-              {
-                type: "transactions_exported",
-                teamId,
-                userEmail,
-                transactionCount: rows.length,
-                downloadLink,
-                accountantEmail: settings.accountantEmail,
-                sendCopyToMe: userEmail ? settings.sendCopyToMe : false,
-              },
-              "notifications",
-            );
-          } catch (error) {
-            this.logger.warn("Failed to trigger export notification", {
-              error: error instanceof Error ? error.message : "Unknown error",
-            });
-          }
+        try {
+          await triggerJob(
+            "notification",
+            {
+              type: "transactions_exported",
+              teamId,
+              userEmail,
+              transactionCount: rows.length,
+              downloadLink,
+              accountantEmail: settings.accountantEmail,
+              sendCopyToMe: userEmail ? settings.sendCopyToMe : false,
+            },
+            "notifications",
+          );
+        } catch (error) {
+          this.logger.warn("Failed to trigger export notification", {
+            error: error instanceof Error ? error.message : "Unknown error",
+          });
         }
       }
     }
