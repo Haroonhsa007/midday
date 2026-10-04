@@ -6,8 +6,9 @@ import {
   updateDocumentByPath,
 } from "@midday/db/queries";
 import { triggerJob } from "@midday/job-client";
-import { createClient } from "@midday/supabase/job";
-import { signedUrl } from "@midday/supabase/storage";
+import { createSignedUrl } from "@midday/storage";
+import { assertTeamKey } from "@midday/storage/keys";
+import { uploadVaultObject } from "@midday/storage/vault";
 import { getAppUrl } from "@midday/utils/envs";
 import archiver from "archiver";
 import type { Job } from "bullmq";
@@ -64,7 +65,6 @@ export class ExportTransactionsProcessor extends BaseProcessor<ExportTransaction
       dateFormat,
       exportSettings,
     } = job.data;
-    const supabase = createClient();
 
     const filePath = `export-${format(new Date(), `${dateFormat ?? "yyyy-MM-dd"}-HHmm`)}`;
     const path = `${teamId}/exports`;
@@ -209,19 +209,17 @@ export class ExportTransactionsProcessor extends BaseProcessor<ExportTransaction
 
     const fullPath = `${path}/${fileName}`;
 
-    // Upload to Supabase storage with timeout
-    const { error: uploadError } = await withTimeout(
-      supabase.storage.from("vault").upload(fullPath, zip, {
-        upsert: true,
+    // Upload and register in vault storage with timeout
+    await withTimeout(
+      uploadVaultObject(getDb(), {
+        teamId: teamId,
+        key: fullPath,
+        body: zip,
         contentType: "application/zip",
       }),
       TIMEOUTS.FILE_UPLOAD,
       `File upload timed out after ${TIMEOUTS.FILE_UPLOAD}ms`,
     );
-
-    if (uploadError) {
-      throw new Error(`Failed to upload export file: ${uploadError.message}`);
-    }
 
     await this.updateProgress(job, 95);
 
@@ -239,16 +237,15 @@ export class ExportTransactionsProcessor extends BaseProcessor<ExportTransaction
 
     if (settings.sendEmail && settings.accountantEmail) {
       const expireIn = 7 * 24 * 60 * 60;
-      const { data: signedUrlData } = await signedUrl(supabase, {
-        bucket: "vault",
-        path: fullPath,
-        expireIn,
-        options: { download: true },
-      });
+      const signedUrlData = await createSignedUrl(
+        "vault",
+        assertTeamKey(teamId, fullPath),
+        { expiresIn: expireIn, download: true },
+      );
 
-      if (signedUrlData?.signedUrl) {
+      if (signedUrlData) {
         const shortLink = await createShortLink(getDb(), {
-          url: signedUrlData.signedUrl,
+          url: signedUrlData,
           teamId,
           userId,
           type: "download",

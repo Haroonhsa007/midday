@@ -17,7 +17,7 @@ export const createShortLinkForDocumentSchema = z
       description: "The path to the file in storage",
       example: "team_123/documents/document.pdf",
     }),
-    expireIn: z.number().default(3600).openapi({
+    expireIn: z.number().int().min(1).max(604800).default(3600).openapi({
       description: "Expiration time in seconds for the signed URL",
       example: 3600,
     }),

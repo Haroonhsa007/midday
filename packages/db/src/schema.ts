@@ -1488,6 +1488,7 @@ export const documents = pgTable(
     ),
     // Composite index for teamId + name queries
     // Used by getDocumentById, updateDocumentByFileName, updateDocuments
+    uniqueIndex("documents_team_id_name_key").on(table.teamId, table.name),
     index("documents_team_id_name_idx").using(
       "btree",
       table.teamId.asc().nullsLast().op("uuid_ops"),

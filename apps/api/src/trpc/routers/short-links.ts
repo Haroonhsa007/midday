@@ -8,12 +8,13 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "@api/trpc/init";
+import { assertStorageTeamKey } from "@api/utils/storage";
 import {
   createShortLink,
   getDocumentById,
   getShortLinkByShortId,
 } from "@midday/db/queries";
-import { signedUrl } from "@midday/supabase/storage";
+import { createSignedUrl } from "@midday/storage";
 
 export const shortLinksRouter = createTRPCRouter({
   createForUrl: protectedProcedure
@@ -38,7 +39,7 @@ export const shortLinksRouter = createTRPCRouter({
 
   createForDocument: protectedProcedure
     .input(createShortLinkForDocumentSchema)
-    .mutation(async ({ ctx: { db, teamId, session, supabase }, input }) => {
+    .mutation(async ({ ctx: { db, teamId, session }, input }) => {
       const document = await getDocumentById(db, {
         id: input.documentId,
         filePath: input.filePath,
@@ -50,22 +51,15 @@ export const shortLinksRouter = createTRPCRouter({
       }
 
       // First create the signed URL for the file
-      const response = await signedUrl(supabase, {
-        bucket: "vault",
-        path: document.pathTokens?.join("/") ?? "",
-        expireIn: input.expireIn,
-        options: {
-          download: true,
-        },
+      const key = assertStorageTeamKey(teamId!, document.pathTokens ?? []);
+      const url = await createSignedUrl("vault", key, {
+        expiresIn: input.expireIn,
+        download: true,
       });
-
-      if (!response.data?.signedUrl) {
-        throw new Error("Failed to create signed URL for file");
-      }
 
       // Then create a short link for the signed URL
       const result = await createShortLink(db, {
-        url: response.data.signedUrl,
+        url: url,
         teamId: teamId!,
         userId: session.user.id,
         type: "download",
@@ -86,7 +80,7 @@ export const shortLinksRouter = createTRPCRouter({
       return {
         ...result,
         shortUrl: `${process.env.MIDDAY_DASHBOARD_URL}/s/${result.shortId}`,
-        originalUrl: response.data.signedUrl,
+        originalUrl: url,
       };
     }),
 
