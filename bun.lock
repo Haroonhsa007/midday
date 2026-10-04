@@ -301,9 +301,9 @@
       "name": "@midday/app-store",
       "version": "1.0.0",
       "dependencies": {
+        "@midday/db": "workspace:*",
         "@slack/bolt": "^4.6.0",
         "@slack/web-api": "^7.15.0",
-        "@supabase/supabase-js": "^2.101.1",
         "zod": "catalog:",
       },
       "devDependencies": {
@@ -565,7 +565,6 @@
         "@microsoft/microsoft-graph-client": "^3.0.7",
         "@midday/db": "workspace:*",
         "@midday/encryption": "workspace:*",
-        "@midday/supabase": "workspace:*",
         "@midday/utils": "workspace:*",
         "googleapis": "^171.4.0",
         "zod": "catalog:",
@@ -622,11 +621,12 @@
       "dependencies": {
         "@ai-sdk/google": "catalog:",
         "@fast-csv/format": "catalog:",
+        "@midday/banking": "workspace:*",
         "@midday/db": "workspace:*",
         "@midday/email": "workspace:*",
         "@midday/encryption": "workspace:*",
         "@midday/notifications": "workspace:*",
-        "@midday/supabase": "workspace:*",
+        "@midday/storage": "workspace:*",
         "@midday/trpc": "workspace:*",
         "@sindresorhus/slugify": "catalog:",
         "@zip.js/zip.js": "^2.8.23",
