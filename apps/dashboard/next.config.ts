@@ -12,6 +12,10 @@ const config = {
   generateBuildId: () => process.env.GIT_COMMIT_SHA || crypto.randomUUID(),
   deploymentId: process.env.GIT_COMMIT_SHA,
   experimental: {
+    // Bound build worker memory on local machines and smaller CI runners.
+    ...(process.env.NEXT_BUILD_WORKERS
+      ? { cpus: Number(process.env.NEXT_BUILD_WORKERS) }
+      : {}),
     optimizePackageImports: [
       "lucide-react",
       "react-icons",

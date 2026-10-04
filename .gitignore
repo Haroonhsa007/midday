@@ -95,3 +95,7 @@ dist-ssr
 
 # Lead/dev agent context (local only)
 context/
+
+# Browser test artifacts
+/test-results/
+playwright-report/

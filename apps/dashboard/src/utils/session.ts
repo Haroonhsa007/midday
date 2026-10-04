@@ -44,7 +44,11 @@ export async function getAccessToken(): Promise<string | null> {
   const request = (async () => {
     try {
       const { data, error } = await authClient.token();
-      if (startedAt !== revision || error || !data?.token) return null;
+      // Session hydration or a cross-tab sign-in can invalidate an in-flight
+      // token. Fetch the current session's token instead of sending an anonymous
+      // request, which would make protected queries sign the user out.
+      if (startedAt !== revision) return getAccessToken();
+      if (error || !data?.token) return null;
       const payload = data.token.split(".")[1];
       if (!payload) return null;
       const { exp } = JSON.parse(

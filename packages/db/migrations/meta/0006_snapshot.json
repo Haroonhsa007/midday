@@ -164,26 +164,18 @@
         "accounting_sync_records_transaction_id_fkey": {
           "name": "accounting_sync_records_transaction_id_fkey",
           "tableFrom": "accounting_sync_records",
-          "columnsFrom": [
-            "transaction_id"
-          ],
+          "columnsFrom": ["transaction_id"],
           "tableTo": "transactions",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "accounting_sync_records_team_id_fkey": {
           "name": "accounting_sync_records_team_id_fkey",
           "tableFrom": "accounting_sync_records",
-          "columnsFrom": [
-            "team_id"
-          ],
+          "columnsFrom": ["team_id"],
           "tableTo": "teams",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -192,10 +184,7 @@
       "uniqueConstraints": {
         "accounting_sync_records_transaction_provider_key": {
           "name": "accounting_sync_records_transaction_provider_key",
-          "columns": [
-            "transaction_id",
-            "provider"
-          ],
+          "columns": ["transaction_id", "provider"],
           "nullsNotDistinct": false
         }
       },
@@ -416,26 +405,18 @@
         "activities_team_id_fkey": {
           "name": "activities_team_id_fkey",
           "tableFrom": "activities",
-          "columnsFrom": [
-            "team_id"
-          ],
+          "columnsFrom": ["team_id"],
           "tableTo": "teams",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "activities_user_id_fkey": {
           "name": "activities_user_id_fkey",
           "tableFrom": "activities",
-          "columnsFrom": [
-            "user_id"
-          ],
+          "columnsFrom": ["user_id"],
           "tableTo": "users",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "set null"
         }
@@ -562,26 +543,18 @@
         "api_keys_user_id_fkey": {
           "name": "api_keys_user_id_fkey",
           "tableFrom": "api_keys",
-          "columnsFrom": [
-            "user_id"
-          ],
+          "columnsFrom": ["user_id"],
           "tableTo": "users",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "api_keys_team_id_fkey": {
           "name": "api_keys_team_id_fkey",
           "tableFrom": "api_keys",
-          "columnsFrom": [
-            "team_id"
-          ],
+          "columnsFrom": ["team_id"],
           "tableTo": "teams",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -590,9 +563,7 @@
       "uniqueConstraints": {
         "api_keys_key_unique": {
           "name": "api_keys_key_unique",
-          "columns": [
-            "key_hash"
-          ],
+          "columns": ["key_hash"],
           "nullsNotDistinct": false
         }
       },
@@ -656,26 +627,18 @@
         "apps_created_by_fkey": {
           "name": "apps_created_by_fkey",
           "tableFrom": "apps",
-          "columnsFrom": [
-            "created_by"
-          ],
+          "columnsFrom": ["created_by"],
           "tableTo": "users",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "integrations_team_id_fkey": {
           "name": "integrations_team_id_fkey",
           "tableFrom": "apps",
-          "columnsFrom": [
-            "team_id"
-          ],
+          "columnsFrom": ["team_id"],
           "tableTo": "teams",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -684,10 +647,7 @@
       "uniqueConstraints": {
         "unique_app_id_team_id": {
           "name": "unique_app_id_team_id",
-          "columns": [
-            "team_id",
-            "app_id"
-          ],
+          "columns": ["team_id", "app_id"],
           "nullsNotDistinct": false
         }
       },
@@ -823,13 +783,9 @@
         "auth_accounts_user_id_auth_users_id_fk": {
           "name": "auth_accounts_user_id_auth_users_id_fk",
           "tableFrom": "auth_accounts",
-          "columnsFrom": [
-            "user_id"
-          ],
+          "columnsFrom": ["user_id"],
           "tableTo": "auth_users",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -933,9 +889,7 @@
       "uniqueConstraints": {
         "auth_rate_limits_key_unique": {
           "name": "auth_rate_limits_key_unique",
-          "columns": [
-            "key"
-          ],
+          "columns": ["key"],
           "nullsNotDistinct": false
         }
       },
@@ -1027,13 +981,9 @@
         "auth_sessions_user_id_auth_users_id_fk": {
           "name": "auth_sessions_user_id_auth_users_id_fk",
           "tableFrom": "auth_sessions",
-          "columnsFrom": [
-            "user_id"
-          ],
+          "columnsFrom": ["user_id"],
           "tableTo": "auth_users",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -1042,9 +992,7 @@
       "uniqueConstraints": {
         "auth_sessions_token_unique": {
           "name": "auth_sessions_token_unique",
-          "columns": [
-            "token"
-          ],
+          "columns": ["token"],
           "nullsNotDistinct": false
         }
       },
@@ -1138,13 +1086,9 @@
         "auth_two_factors_user_id_auth_users_id_fk": {
           "name": "auth_two_factors_user_id_auth_users_id_fk",
           "tableFrom": "auth_two_factors",
-          "columnsFrom": [
-            "user_id"
-          ],
+          "columnsFrom": ["user_id"],
           "tableTo": "auth_users",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -1220,9 +1164,7 @@
       "uniqueConstraints": {
         "auth_users_email_unique": {
           "name": "auth_users_email_unique",
-          "columns": [
-            "email"
-          ],
+          "columns": ["email"],
           "nullsNotDistinct": false
         }
       },
@@ -1519,39 +1461,27 @@
         "bank_accounts_bank_connection_id_fkey": {
           "name": "bank_accounts_bank_connection_id_fkey",
           "tableFrom": "bank_accounts",
-          "columnsFrom": [
-            "bank_connection_id"
-          ],
+          "columnsFrom": ["bank_connection_id"],
           "tableTo": "bank_connections",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "bank_accounts_created_by_fkey": {
           "name": "bank_accounts_created_by_fkey",
           "tableFrom": "bank_accounts",
-          "columnsFrom": [
-            "created_by"
-          ],
+          "columnsFrom": ["created_by"],
           "tableTo": "users",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "public_bank_accounts_team_id_fkey": {
           "name": "public_bank_accounts_team_id_fkey",
           "tableFrom": "bank_accounts",
-          "columnsFrom": [
-            "team_id"
-          ],
+          "columnsFrom": ["team_id"],
           "tableTo": "teams",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -1685,13 +1615,9 @@
         "bank_connections_team_id_fkey": {
           "name": "bank_connections_team_id_fkey",
           "tableFrom": "bank_connections",
-          "columnsFrom": [
-            "team_id"
-          ],
+          "columnsFrom": ["team_id"],
           "tableTo": "teams",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -1700,10 +1626,7 @@
       "uniqueConstraints": {
         "unique_bank_connections": {
           "name": "unique_bank_connections",
-          "columns": [
-            "institution_id",
-            "team_id"
-          ],
+          "columns": ["institution_id", "team_id"],
           "nullsNotDistinct": false
         }
       },
@@ -1753,39 +1676,27 @@
         "customer_tags_customer_id_fkey": {
           "name": "customer_tags_customer_id_fkey",
           "tableFrom": "customer_tags",
-          "columnsFrom": [
-            "customer_id"
-          ],
+          "columnsFrom": ["customer_id"],
           "tableTo": "customers",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "customer_tags_tag_id_fkey": {
           "name": "customer_tags_tag_id_fkey",
           "tableFrom": "customer_tags",
-          "columnsFrom": [
-            "tag_id"
-          ],
+          "columnsFrom": ["tag_id"],
           "tableTo": "tags",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "customer_tags_team_id_fkey": {
           "name": "customer_tags_team_id_fkey",
           "tableFrom": "customer_tags",
-          "columnsFrom": [
-            "team_id"
-          ],
+          "columnsFrom": ["team_id"],
           "tableTo": "teams",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -1794,10 +1705,7 @@
       "uniqueConstraints": {
         "unique_customer_tag": {
           "name": "unique_customer_tag",
-          "columns": [
-            "customer_id",
-            "tag_id"
-          ],
+          "columns": ["customer_id", "tag_id"],
           "nullsNotDistinct": false
         }
       },
@@ -2255,13 +2163,9 @@
         "customers_team_id_fkey": {
           "name": "customers_team_id_fkey",
           "tableFrom": "customers",
-          "columnsFrom": [
-            "team_id"
-          ],
+          "columnsFrom": ["team_id"],
           "tableTo": "teams",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -2333,39 +2237,27 @@
         "document_tag_assignments_document_id_fkey": {
           "name": "document_tag_assignments_document_id_fkey",
           "tableFrom": "document_tag_assignments",
-          "columnsFrom": [
-            "document_id"
-          ],
+          "columnsFrom": ["document_id"],
           "tableTo": "documents",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "document_tag_assignments_tag_id_fkey": {
           "name": "document_tag_assignments_tag_id_fkey",
           "tableFrom": "document_tag_assignments",
-          "columnsFrom": [
-            "tag_id"
-          ],
+          "columnsFrom": ["tag_id"],
           "tableTo": "document_tags",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "document_tag_assignments_team_id_fkey": {
           "name": "document_tag_assignments_team_id_fkey",
           "tableFrom": "document_tag_assignments",
-          "columnsFrom": [
-            "team_id"
-          ],
+          "columnsFrom": ["team_id"],
           "tableTo": "teams",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -2373,19 +2265,13 @@
       "compositePrimaryKeys": {
         "document_tag_assignments_pkey": {
           "name": "document_tag_assignments_pkey",
-          "columns": [
-            "document_id",
-            "tag_id"
-          ]
+          "columns": ["document_id", "tag_id"]
         }
       },
       "uniqueConstraints": {
         "document_tag_assignments_unique": {
           "name": "document_tag_assignments_unique",
-          "columns": [
-            "document_id",
-            "tag_id"
-          ],
+          "columns": ["document_id", "tag_id"],
           "nullsNotDistinct": false
         }
       },
@@ -2473,13 +2359,9 @@
         "document_tags_team_id_fkey": {
           "name": "document_tags_team_id_fkey",
           "tableFrom": "document_tags",
-          "columnsFrom": [
-            "team_id"
-          ],
+          "columnsFrom": ["team_id"],
           "tableTo": "teams",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -2488,10 +2370,7 @@
       "uniqueConstraints": {
         "unique_slug_per_team": {
           "name": "unique_slug_per_team",
-          "columns": [
-            "slug",
-            "team_id"
-          ],
+          "columns": ["slug", "team_id"],
           "nullsNotDistinct": false
         }
       },
@@ -2866,26 +2745,18 @@
         "documents_created_by_fkey": {
           "name": "documents_created_by_fkey",
           "tableFrom": "documents",
-          "columnsFrom": [
-            "owner_id"
-          ],
+          "columnsFrom": ["owner_id"],
           "tableTo": "users",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "set null"
         },
         "storage_team_id_fkey": {
           "name": "storage_team_id_fkey",
           "tableFrom": "documents",
-          "columnsFrom": [
-            "team_id"
-          ],
+          "columnsFrom": ["team_id"],
           "tableTo": "teams",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -2962,10 +2833,7 @@
       "uniqueConstraints": {
         "unique_rate": {
           "name": "unique_rate",
-          "columns": [
-            "base",
-            "target"
-          ],
+          "columns": ["base", "target"],
           "nullsNotDistinct": false
         }
       },
@@ -3328,52 +3196,36 @@
         "inbox_attachment_id_fkey": {
           "name": "inbox_attachment_id_fkey",
           "tableFrom": "inbox",
-          "columnsFrom": [
-            "attachment_id"
-          ],
+          "columnsFrom": ["attachment_id"],
           "tableTo": "transaction_attachments",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "set null"
         },
         "public_inbox_team_id_fkey": {
           "name": "public_inbox_team_id_fkey",
           "tableFrom": "inbox",
-          "columnsFrom": [
-            "team_id"
-          ],
+          "columnsFrom": ["team_id"],
           "tableTo": "teams",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "public_inbox_transaction_id_fkey": {
           "name": "public_inbox_transaction_id_fkey",
           "tableFrom": "inbox",
-          "columnsFrom": [
-            "transaction_id"
-          ],
+          "columnsFrom": ["transaction_id"],
           "tableTo": "transactions",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "set null"
         },
         "inbox_inbox_account_id_fkey": {
           "name": "inbox_inbox_account_id_fkey",
           "tableFrom": "inbox",
-          "columnsFrom": [
-            "inbox_account_id"
-          ],
+          "columnsFrom": ["inbox_account_id"],
           "tableTo": "inbox_accounts",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "set null"
         }
@@ -3382,9 +3234,7 @@
       "uniqueConstraints": {
         "inbox_reference_id_key": {
           "name": "inbox_reference_id_key",
-          "columns": [
-            "reference_id"
-          ],
+          "columns": ["reference_id"],
           "nullsNotDistinct": false
         }
       },
@@ -3485,13 +3335,9 @@
         "inbox_accounts_team_id_fkey": {
           "name": "inbox_accounts_team_id_fkey",
           "tableFrom": "inbox_accounts",
-          "columnsFrom": [
-            "team_id"
-          ],
+          "columnsFrom": ["team_id"],
           "tableTo": "teams",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -3500,16 +3346,12 @@
       "uniqueConstraints": {
         "inbox_accounts_email_key": {
           "name": "inbox_accounts_email_key",
-          "columns": [
-            "email"
-          ],
+          "columns": ["email"],
           "nullsNotDistinct": false
         },
         "inbox_accounts_external_id_key": {
           "name": "inbox_accounts_external_id_key",
-          "columns": [
-            "external_id"
-          ],
+          "columns": ["external_id"],
           "nullsNotDistinct": false
         }
       },
@@ -3560,13 +3402,9 @@
         "inbox_blocklist_team_id_fkey": {
           "name": "inbox_blocklist_team_id_fkey",
           "tableFrom": "inbox_blocklist",
-          "columnsFrom": [
-            "team_id"
-          ],
+          "columnsFrom": ["team_id"],
           "tableTo": "teams",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -3575,11 +3413,7 @@
       "uniqueConstraints": {
         "inbox_blocklist_team_id_type_value_key": {
           "name": "inbox_blocklist_team_id_type_value_key",
-          "columns": [
-            "team_id",
-            "type",
-            "value"
-          ],
+          "columns": ["team_id", "type", "value"],
           "nullsNotDistinct": false
         }
       },
@@ -3666,26 +3500,18 @@
         "insight_user_status_insight_id_insights_id_fk": {
           "name": "insight_user_status_insight_id_insights_id_fk",
           "tableFrom": "insight_user_status",
-          "columnsFrom": [
-            "insight_id"
-          ],
+          "columnsFrom": ["insight_id"],
           "tableTo": "insights",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "insight_user_status_user_id_users_id_fk": {
           "name": "insight_user_status_user_id_users_id_fk",
           "tableFrom": "insight_user_status",
-          "columnsFrom": [
-            "user_id"
-          ],
+          "columnsFrom": ["user_id"],
           "tableTo": "users",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -3693,10 +3519,7 @@
       "compositePrimaryKeys": {
         "insight_user_status_insight_id_user_id_pk": {
           "name": "insight_user_status_insight_id_user_id_pk",
-          "columns": [
-            "insight_id",
-            "user_id"
-          ]
+          "columns": ["insight_id", "user_id"]
         }
       },
       "uniqueConstraints": {},
@@ -3895,13 +3718,9 @@
         "insights_team_id_teams_id_fk": {
           "name": "insights_team_id_teams_id_fk",
           "tableFrom": "insights",
-          "columnsFrom": [
-            "team_id"
-          ],
+          "columnsFrom": ["team_id"],
           "tableTo": "teams",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -3910,12 +3729,7 @@
       "uniqueConstraints": {
         "insights_team_period_unique": {
           "name": "insights_team_period_unique",
-          "columns": [
-            "team_id",
-            "period_type",
-            "period_year",
-            "period_number"
-          ],
+          "columns": ["team_id", "period_type", "period_year", "period_number"],
           "nullsNotDistinct": false
         }
       },
@@ -4308,26 +4122,18 @@
         "invoice_products_team_id_fkey": {
           "name": "invoice_products_team_id_fkey",
           "tableFrom": "invoice_products",
-          "columnsFrom": [
-            "team_id"
-          ],
+          "columnsFrom": ["team_id"],
           "tableTo": "teams",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "invoice_products_created_by_fkey": {
           "name": "invoice_products_created_by_fkey",
           "tableFrom": "invoice_products",
-          "columnsFrom": [
-            "created_by"
-          ],
+          "columnsFrom": ["created_by"],
           "tableTo": "users",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "set null"
         }
@@ -4336,12 +4142,7 @@
       "uniqueConstraints": {
         "invoice_products_team_name_currency_price_unique": {
           "name": "invoice_products_team_name_currency_price_unique",
-          "columns": [
-            "team_id",
-            "name",
-            "currency",
-            "price"
-          ],
+          "columns": ["team_id", "name", "currency", "price"],
           "nullsNotDistinct": false
         }
       },
@@ -4650,52 +4451,36 @@
         "invoice_recurring_team_id_fkey": {
           "name": "invoice_recurring_team_id_fkey",
           "tableFrom": "invoice_recurring",
-          "columnsFrom": [
-            "team_id"
-          ],
+          "columnsFrom": ["team_id"],
           "tableTo": "teams",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "invoice_recurring_user_id_fkey": {
           "name": "invoice_recurring_user_id_fkey",
           "tableFrom": "invoice_recurring",
-          "columnsFrom": [
-            "user_id"
-          ],
+          "columnsFrom": ["user_id"],
           "tableTo": "users",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "invoice_recurring_customer_id_fkey": {
           "name": "invoice_recurring_customer_id_fkey",
           "tableFrom": "invoice_recurring",
-          "columnsFrom": [
-            "customer_id"
-          ],
+          "columnsFrom": ["customer_id"],
           "tableTo": "customers",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "set null"
         },
         "invoice_recurring_template_id_fkey": {
           "name": "invoice_recurring_template_id_fkey",
           "tableFrom": "invoice_recurring",
-          "columnsFrom": [
-            "template_id"
-          ],
+          "columnsFrom": ["template_id"],
           "tableTo": "invoice_templates",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "set null"
         }
@@ -5031,13 +4816,9 @@
         "invoice_settings_team_id_fkey": {
           "name": "invoice_settings_team_id_fkey",
           "tableFrom": "invoice_templates",
-          "columnsFrom": [
-            "team_id"
-          ],
+          "columnsFrom": ["team_id"],
           "tableTo": "teams",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -5597,65 +5378,45 @@
         "invoices_created_by_fkey": {
           "name": "invoices_created_by_fkey",
           "tableFrom": "invoices",
-          "columnsFrom": [
-            "user_id"
-          ],
+          "columnsFrom": ["user_id"],
           "tableTo": "users",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "invoices_customer_id_fkey": {
           "name": "invoices_customer_id_fkey",
           "tableFrom": "invoices",
-          "columnsFrom": [
-            "customer_id"
-          ],
+          "columnsFrom": ["customer_id"],
           "tableTo": "customers",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "set null"
         },
         "invoices_team_id_fkey": {
           "name": "invoices_team_id_fkey",
           "tableFrom": "invoices",
-          "columnsFrom": [
-            "team_id"
-          ],
+          "columnsFrom": ["team_id"],
           "tableTo": "teams",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "invoices_template_id_fkey": {
           "name": "invoices_template_id_fkey",
           "tableFrom": "invoices",
-          "columnsFrom": [
-            "template_id"
-          ],
+          "columnsFrom": ["template_id"],
           "tableTo": "invoice_templates",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "set null"
         },
         "invoices_invoice_recurring_id_fkey": {
           "name": "invoices_invoice_recurring_id_fkey",
           "tableFrom": "invoices",
-          "columnsFrom": [
-            "invoice_recurring_id"
-          ],
+          "columnsFrom": ["invoice_recurring_id"],
           "tableTo": "invoice_recurring",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "set null"
         }
@@ -5664,9 +5425,7 @@
       "uniqueConstraints": {
         "invoices_scheduled_job_id_key": {
           "name": "invoices_scheduled_job_id_key",
-          "columns": [
-            "scheduled_job_id"
-          ],
+          "columns": ["scheduled_job_id"],
           "nullsNotDistinct": false
         }
       },
@@ -5779,26 +5538,18 @@
         "notification_settings_user_id_fkey": {
           "name": "notification_settings_user_id_fkey",
           "tableFrom": "notification_settings",
-          "columnsFrom": [
-            "user_id"
-          ],
+          "columnsFrom": ["user_id"],
           "tableTo": "users",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "notification_settings_team_id_fkey": {
           "name": "notification_settings_team_id_fkey",
           "tableFrom": "notification_settings",
-          "columnsFrom": [
-            "team_id"
-          ],
+          "columnsFrom": ["team_id"],
           "tableTo": "teams",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -5807,12 +5558,7 @@
       "uniqueConstraints": {
         "notification_settings_user_team_type_channel_key": {
           "name": "notification_settings_user_team_type_channel_key",
-          "columns": [
-            "user_id",
-            "team_id",
-            "notification_type",
-            "channel"
-          ],
+          "columns": ["user_id", "team_id", "notification_type", "channel"],
           "nullsNotDistinct": false
         }
       },
@@ -5976,39 +5722,27 @@
         "oauth_access_tokens_application_id_fkey": {
           "name": "oauth_access_tokens_application_id_fkey",
           "tableFrom": "oauth_access_tokens",
-          "columnsFrom": [
-            "application_id"
-          ],
+          "columnsFrom": ["application_id"],
           "tableTo": "oauth_applications",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "oauth_access_tokens_user_id_fkey": {
           "name": "oauth_access_tokens_user_id_fkey",
           "tableFrom": "oauth_access_tokens",
-          "columnsFrom": [
-            "user_id"
-          ],
+          "columnsFrom": ["user_id"],
           "tableTo": "users",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "oauth_access_tokens_team_id_fkey": {
           "name": "oauth_access_tokens_team_id_fkey",
           "tableFrom": "oauth_access_tokens",
-          "columnsFrom": [
-            "team_id"
-          ],
+          "columnsFrom": ["team_id"],
           "tableTo": "teams",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -6017,16 +5751,12 @@
       "uniqueConstraints": {
         "oauth_access_tokens_token_unique": {
           "name": "oauth_access_tokens_token_unique",
-          "columns": [
-            "token"
-          ],
+          "columns": ["token"],
           "nullsNotDistinct": false
         },
         "oauth_access_tokens_refresh_token_unique": {
           "name": "oauth_access_tokens_refresh_token_unique",
-          "columns": [
-            "refresh_token"
-          ],
+          "columns": ["refresh_token"],
           "nullsNotDistinct": false
         }
       },
@@ -6227,26 +5957,18 @@
         "oauth_applications_team_id_fkey": {
           "name": "oauth_applications_team_id_fkey",
           "tableFrom": "oauth_applications",
-          "columnsFrom": [
-            "team_id"
-          ],
+          "columnsFrom": ["team_id"],
           "tableTo": "teams",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "oauth_applications_created_by_fkey": {
           "name": "oauth_applications_created_by_fkey",
           "tableFrom": "oauth_applications",
-          "columnsFrom": [
-            "created_by"
-          ],
+          "columnsFrom": ["created_by"],
           "tableTo": "users",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -6255,16 +5977,12 @@
       "uniqueConstraints": {
         "oauth_applications_slug_unique": {
           "name": "oauth_applications_slug_unique",
-          "columns": [
-            "slug"
-          ],
+          "columns": ["slug"],
           "nullsNotDistinct": false
         },
         "oauth_applications_client_id_unique": {
           "name": "oauth_applications_client_id_unique",
-          "columns": [
-            "client_id"
-          ],
+          "columns": ["client_id"],
           "nullsNotDistinct": false
         }
       },
@@ -6406,39 +6124,27 @@
         "oauth_authorization_codes_application_id_fkey": {
           "name": "oauth_authorization_codes_application_id_fkey",
           "tableFrom": "oauth_authorization_codes",
-          "columnsFrom": [
-            "application_id"
-          ],
+          "columnsFrom": ["application_id"],
           "tableTo": "oauth_applications",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "oauth_authorization_codes_user_id_fkey": {
           "name": "oauth_authorization_codes_user_id_fkey",
           "tableFrom": "oauth_authorization_codes",
-          "columnsFrom": [
-            "user_id"
-          ],
+          "columnsFrom": ["user_id"],
           "tableTo": "users",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "oauth_authorization_codes_team_id_fkey": {
           "name": "oauth_authorization_codes_team_id_fkey",
           "tableFrom": "oauth_authorization_codes",
-          "columnsFrom": [
-            "team_id"
-          ],
+          "columnsFrom": ["team_id"],
           "tableTo": "teams",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -6447,9 +6153,7 @@
       "uniqueConstraints": {
         "oauth_authorization_codes_code_unique": {
           "name": "oauth_authorization_codes_code_unique",
-          "columns": [
-            "code"
-          ],
+          "columns": ["code"],
           "nullsNotDistinct": false
         }
       },
@@ -6590,26 +6294,18 @@
         "platform_identities_team_id_fkey": {
           "name": "platform_identities_team_id_fkey",
           "tableFrom": "platform_identities",
-          "columnsFrom": [
-            "team_id"
-          ],
+          "columnsFrom": ["team_id"],
           "tableTo": "teams",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "platform_identities_user_id_fkey": {
           "name": "platform_identities_user_id_fkey",
           "tableFrom": "platform_identities",
-          "columnsFrom": [
-            "user_id"
-          ],
+          "columnsFrom": ["user_id"],
           "tableTo": "users",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -6618,11 +6314,7 @@
       "uniqueConstraints": {
         "platform_identities_provider_external_unique": {
           "name": "platform_identities_provider_external_unique",
-          "columns": [
-            "provider",
-            "external_team_id",
-            "external_user_id"
-          ],
+          "columns": ["provider", "external_team_id", "external_user_id"],
           "nullsNotDistinct": false
         }
       },
@@ -6743,26 +6435,18 @@
         "platform_link_tokens_team_id_fkey": {
           "name": "platform_link_tokens_team_id_fkey",
           "tableFrom": "platform_link_tokens",
-          "columnsFrom": [
-            "team_id"
-          ],
+          "columnsFrom": ["team_id"],
           "tableTo": "teams",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "platform_link_tokens_user_id_fkey": {
           "name": "platform_link_tokens_user_id_fkey",
           "tableFrom": "platform_link_tokens",
-          "columnsFrom": [
-            "user_id"
-          ],
+          "columnsFrom": ["user_id"],
           "tableTo": "users",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -6771,9 +6455,7 @@
       "uniqueConstraints": {
         "platform_link_tokens_code_unique": {
           "name": "platform_link_tokens_code_unique",
-          "columns": [
-            "code"
-          ],
+          "columns": ["code"],
           "nullsNotDistinct": false
         }
       },
@@ -6925,39 +6607,27 @@
         "provider_notification_batches_identity_id_fkey": {
           "name": "provider_notification_batches_identity_id_fkey",
           "tableFrom": "provider_notification_batches",
-          "columnsFrom": [
-            "platform_identity_id"
-          ],
+          "columnsFrom": ["platform_identity_id"],
           "tableTo": "platform_identities",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "provider_notification_batches_team_id_fkey": {
           "name": "provider_notification_batches_team_id_fkey",
           "tableFrom": "provider_notification_batches",
-          "columnsFrom": [
-            "team_id"
-          ],
+          "columnsFrom": ["team_id"],
           "tableTo": "teams",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "provider_notification_batches_user_id_fkey": {
           "name": "provider_notification_batches_user_id_fkey",
           "tableFrom": "provider_notification_batches",
-          "columnsFrom": [
-            "user_id"
-          ],
+          "columnsFrom": ["user_id"],
           "tableTo": "users",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -6966,9 +6636,7 @@
       "uniqueConstraints": {
         "provider_notification_batches_batch_key_unique": {
           "name": "provider_notification_batches_batch_key_unique",
-          "columns": [
-            "batch_key"
-          ],
+          "columns": ["batch_key"],
           "nullsNotDistinct": false
         }
       },
@@ -7072,26 +6740,18 @@
         "public_reports_created_by_fkey": {
           "name": "public_reports_created_by_fkey",
           "tableFrom": "reports",
-          "columnsFrom": [
-            "created_by"
-          ],
+          "columnsFrom": ["created_by"],
           "tableTo": "users",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "reports_team_id_fkey": {
           "name": "reports_team_id_fkey",
           "tableFrom": "reports",
-          "columnsFrom": [
-            "team_id"
-          ],
+          "columnsFrom": ["team_id"],
           "tableTo": "teams",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -7241,26 +6901,18 @@
         "short_links_user_id_fkey": {
           "name": "short_links_user_id_fkey",
           "tableFrom": "short_links",
-          "columnsFrom": [
-            "user_id"
-          ],
+          "columnsFrom": ["user_id"],
           "tableTo": "users",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "short_links_team_id_fkey": {
           "name": "short_links_team_id_fkey",
           "tableFrom": "short_links",
-          "columnsFrom": [
-            "team_id"
-          ],
+          "columnsFrom": ["team_id"],
           "tableTo": "teams",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -7269,9 +6921,7 @@
       "uniqueConstraints": {
         "short_links_short_id_unique": {
           "name": "short_links_short_id_unique",
-          "columns": [
-            "short_id"
-          ],
+          "columns": ["short_id"],
           "nullsNotDistinct": false
         }
       },
@@ -7332,13 +6982,9 @@
         "tags_team_id_fkey": {
           "name": "tags_team_id_fkey",
           "tableFrom": "tags",
-          "columnsFrom": [
-            "team_id"
-          ],
+          "columnsFrom": ["team_id"],
           "tableTo": "teams",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -7347,10 +6993,7 @@
       "uniqueConstraints": {
         "unique_tag_name": {
           "name": "unique_tag_name",
-          "columns": [
-            "team_id",
-            "name"
-          ],
+          "columns": ["team_id", "name"],
           "nullsNotDistinct": false
         }
       },
@@ -7503,9 +7146,7 @@
       "uniqueConstraints": {
         "teams_inbox_id_key": {
           "name": "teams_inbox_id_key",
-          "columns": [
-            "inbox_id"
-          ],
+          "columns": ["inbox_id"],
           "nullsNotDistinct": false
         }
       },
@@ -7643,39 +7284,27 @@
         "tracker_entries_assigned_id_fkey": {
           "name": "tracker_entries_assigned_id_fkey",
           "tableFrom": "tracker_entries",
-          "columnsFrom": [
-            "assigned_id"
-          ],
+          "columnsFrom": ["assigned_id"],
           "tableTo": "users",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "set null"
         },
         "tracker_entries_project_id_fkey": {
           "name": "tracker_entries_project_id_fkey",
           "tableFrom": "tracker_entries",
-          "columnsFrom": [
-            "project_id"
-          ],
+          "columnsFrom": ["project_id"],
           "tableTo": "tracker_projects",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "tracker_entries_team_id_fkey": {
           "name": "tracker_entries_team_id_fkey",
           "tableFrom": "tracker_entries",
-          "columnsFrom": [
-            "team_id"
-          ],
+          "columnsFrom": ["team_id"],
           "tableTo": "teams",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -7775,39 +7404,27 @@
         "project_tags_tag_id_fkey": {
           "name": "project_tags_tag_id_fkey",
           "tableFrom": "tracker_project_tags",
-          "columnsFrom": [
-            "tag_id"
-          ],
+          "columnsFrom": ["tag_id"],
           "tableTo": "tags",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "project_tags_tracker_project_id_fkey": {
           "name": "project_tags_tracker_project_id_fkey",
           "tableFrom": "tracker_project_tags",
-          "columnsFrom": [
-            "tracker_project_id"
-          ],
+          "columnsFrom": ["tracker_project_id"],
           "tableTo": "tracker_projects",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "tracker_project_tags_team_id_fkey": {
           "name": "tracker_project_tags_team_id_fkey",
           "tableFrom": "tracker_project_tags",
-          "columnsFrom": [
-            "team_id"
-          ],
+          "columnsFrom": ["team_id"],
           "tableTo": "teams",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -7816,10 +7433,7 @@
       "uniqueConstraints": {
         "unique_project_tag": {
           "name": "unique_project_tag",
-          "columns": [
-            "tracker_project_id",
-            "tag_id"
-          ],
+          "columns": ["tracker_project_id", "tag_id"],
           "nullsNotDistinct": false
         }
       },
@@ -7951,26 +7565,18 @@
         "tracker_projects_customer_id_fkey": {
           "name": "tracker_projects_customer_id_fkey",
           "tableFrom": "tracker_projects",
-          "columnsFrom": [
-            "customer_id"
-          ],
+          "columnsFrom": ["customer_id"],
           "tableTo": "customers",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "tracker_projects_team_id_fkey": {
           "name": "tracker_projects_team_id_fkey",
           "tableFrom": "tracker_projects",
-          "columnsFrom": [
-            "team_id"
-          ],
+          "columnsFrom": ["team_id"],
           "tableTo": "teams",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -8054,39 +7660,27 @@
         "public_tracker_reports_created_by_fkey": {
           "name": "public_tracker_reports_created_by_fkey",
           "tableFrom": "tracker_reports",
-          "columnsFrom": [
-            "created_by"
-          ],
+          "columnsFrom": ["created_by"],
           "tableTo": "users",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "public_tracker_reports_project_id_fkey": {
           "name": "public_tracker_reports_project_id_fkey",
           "tableFrom": "tracker_reports",
-          "columnsFrom": [
-            "project_id"
-          ],
+          "columnsFrom": ["project_id"],
           "tableTo": "tracker_projects",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "cascade",
           "onDelete": "cascade"
         },
         "tracker_reports_team_id_fkey": {
           "name": "tracker_reports_team_id_fkey",
           "tableFrom": "tracker_reports",
-          "columnsFrom": [
-            "team_id"
-          ],
+          "columnsFrom": ["team_id"],
           "tableTo": "teams",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "cascade",
           "onDelete": "cascade"
         }
@@ -8190,26 +7784,18 @@
         "public_transaction_attachments_team_id_fkey": {
           "name": "public_transaction_attachments_team_id_fkey",
           "tableFrom": "transaction_attachments",
-          "columnsFrom": [
-            "team_id"
-          ],
+          "columnsFrom": ["team_id"],
           "tableTo": "teams",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "public_transaction_attachments_transaction_id_fkey": {
           "name": "public_transaction_attachments_transaction_id_fkey",
           "tableFrom": "transaction_attachments",
-          "columnsFrom": [
-            "transaction_id"
-          ],
+          "columnsFrom": ["transaction_id"],
           "tableTo": "transactions",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "set null"
         }
@@ -8345,26 +7931,18 @@
         "transaction_categories_team_id_fkey": {
           "name": "transaction_categories_team_id_fkey",
           "tableFrom": "transaction_categories",
-          "columnsFrom": [
-            "team_id"
-          ],
+          "columnsFrom": ["team_id"],
           "tableTo": "teams",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "transaction_categories_parent_id_fkey": {
           "name": "transaction_categories_parent_id_fkey",
           "tableFrom": "transaction_categories",
-          "columnsFrom": [
-            "parent_id"
-          ],
+          "columnsFrom": ["parent_id"],
           "tableTo": "transaction_categories",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "set null"
         }
@@ -8372,26 +7950,18 @@
       "compositePrimaryKeys": {
         "transaction_categories_pkey": {
           "name": "transaction_categories_pkey",
-          "columns": [
-            "team_id",
-            "slug"
-          ]
+          "columns": ["team_id", "slug"]
         }
       },
       "uniqueConstraints": {
         "transaction_categories_id_unique": {
           "name": "transaction_categories_id_unique",
-          "columns": [
-            "id"
-          ],
+          "columns": ["id"],
           "nullsNotDistinct": false
         },
         "unique_team_slug": {
           "name": "unique_team_slug",
-          "columns": [
-            "team_id",
-            "slug"
-          ],
+          "columns": ["team_id", "slug"],
           "nullsNotDistinct": false
         }
       },
@@ -8542,28 +8112,18 @@
         "transaction_enrichments_category_slug_team_id_fkey": {
           "name": "transaction_enrichments_category_slug_team_id_fkey",
           "tableFrom": "transaction_enrichments",
-          "columnsFrom": [
-            "team_id",
-            "category_slug"
-          ],
+          "columnsFrom": ["team_id", "category_slug"],
           "tableTo": "transaction_categories",
-          "columnsTo": [
-            "team_id",
-            "slug"
-          ],
+          "columnsTo": ["team_id", "slug"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "transaction_enrichments_team_id_fkey": {
           "name": "transaction_enrichments_team_id_fkey",
           "tableFrom": "transaction_enrichments",
-          "columnsFrom": [
-            "team_id"
-          ],
+          "columnsFrom": ["team_id"],
           "tableTo": "teams",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -8572,10 +8132,7 @@
       "uniqueConstraints": {
         "unique_team_name": {
           "name": "unique_team_name",
-          "columns": [
-            "name",
-            "team_id"
-          ],
+          "columns": ["name", "team_id"],
           "nullsNotDistinct": false
         }
       },
@@ -8832,52 +8389,36 @@
         "transaction_match_suggestions_inbox_id_fkey": {
           "name": "transaction_match_suggestions_inbox_id_fkey",
           "tableFrom": "transaction_match_suggestions",
-          "columnsFrom": [
-            "inbox_id"
-          ],
+          "columnsFrom": ["inbox_id"],
           "tableTo": "inbox",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "transaction_match_suggestions_transaction_id_fkey": {
           "name": "transaction_match_suggestions_transaction_id_fkey",
           "tableFrom": "transaction_match_suggestions",
-          "columnsFrom": [
-            "transaction_id"
-          ],
+          "columnsFrom": ["transaction_id"],
           "tableTo": "transactions",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "transaction_match_suggestions_team_id_fkey": {
           "name": "transaction_match_suggestions_team_id_fkey",
           "tableFrom": "transaction_match_suggestions",
-          "columnsFrom": [
-            "team_id"
-          ],
+          "columnsFrom": ["team_id"],
           "tableTo": "teams",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "transaction_match_suggestions_user_id_fkey": {
           "name": "transaction_match_suggestions_user_id_fkey",
           "tableFrom": "transaction_match_suggestions",
-          "columnsFrom": [
-            "user_id"
-          ],
+          "columnsFrom": ["user_id"],
           "tableTo": "users",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "set null"
         }
@@ -8886,10 +8427,7 @@
       "uniqueConstraints": {
         "transaction_match_suggestions_unique": {
           "name": "transaction_match_suggestions_unique",
-          "columns": [
-            "inbox_id",
-            "transaction_id"
-          ],
+          "columns": ["inbox_id", "transaction_id"],
           "nullsNotDistinct": false
         }
       },
@@ -9002,39 +8540,27 @@
         "transaction_tags_tag_id_fkey": {
           "name": "transaction_tags_tag_id_fkey",
           "tableFrom": "transaction_tags",
-          "columnsFrom": [
-            "tag_id"
-          ],
+          "columnsFrom": ["tag_id"],
           "tableTo": "tags",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "transaction_tags_team_id_fkey": {
           "name": "transaction_tags_team_id_fkey",
           "tableFrom": "transaction_tags",
-          "columnsFrom": [
-            "team_id"
-          ],
+          "columnsFrom": ["team_id"],
           "tableTo": "teams",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "transaction_tags_transaction_id_fkey": {
           "name": "transaction_tags_transaction_id_fkey",
           "tableFrom": "transaction_tags",
-          "columnsFrom": [
-            "transaction_id"
-          ],
+          "columnsFrom": ["transaction_id"],
           "tableTo": "transactions",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -9043,10 +8569,7 @@
       "uniqueConstraints": {
         "unique_tag": {
           "name": "unique_tag",
-          "columns": [
-            "tag_id",
-            "transaction_id"
-          ],
+          "columns": ["tag_id", "transaction_id"],
           "nullsNotDistinct": false
         }
       },
@@ -9551,54 +9074,36 @@
         "public_transactions_assigned_id_fkey": {
           "name": "public_transactions_assigned_id_fkey",
           "tableFrom": "transactions",
-          "columnsFrom": [
-            "assigned_id"
-          ],
+          "columnsFrom": ["assigned_id"],
           "tableTo": "users",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "set null"
         },
         "public_transactions_team_id_fkey": {
           "name": "public_transactions_team_id_fkey",
           "tableFrom": "transactions",
-          "columnsFrom": [
-            "team_id"
-          ],
+          "columnsFrom": ["team_id"],
           "tableTo": "teams",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "transactions_bank_account_id_fkey": {
           "name": "transactions_bank_account_id_fkey",
           "tableFrom": "transactions",
-          "columnsFrom": [
-            "bank_account_id"
-          ],
+          "columnsFrom": ["bank_account_id"],
           "tableTo": "bank_accounts",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "transactions_category_slug_team_id_fkey": {
           "name": "transactions_category_slug_team_id_fkey",
           "tableFrom": "transactions",
-          "columnsFrom": [
-            "team_id",
-            "category_slug"
-          ],
+          "columnsFrom": ["team_id", "category_slug"],
           "tableTo": "transaction_categories",
-          "columnsTo": [
-            "team_id",
-            "slug"
-          ],
+          "columnsTo": ["team_id", "slug"],
           "onUpdate": "no action",
           "onDelete": "no action"
         }
@@ -9607,9 +9112,7 @@
       "uniqueConstraints": {
         "transactions_internal_id_key": {
           "name": "transactions_internal_id_key",
-          "columns": [
-            "internal_id"
-          ],
+          "columns": ["internal_id"],
           "nullsNotDistinct": false
         }
       },
@@ -9690,26 +9193,18 @@
         "public_user_invites_team_id_fkey": {
           "name": "public_user_invites_team_id_fkey",
           "tableFrom": "user_invites",
-          "columnsFrom": [
-            "team_id"
-          ],
+          "columnsFrom": ["team_id"],
           "tableTo": "teams",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "user_invites_invited_by_fkey": {
           "name": "user_invites_invited_by_fkey",
           "tableFrom": "user_invites",
-          "columnsFrom": [
-            "invited_by"
-          ],
+          "columnsFrom": ["invited_by"],
           "tableTo": "users",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -9718,17 +9213,12 @@
       "uniqueConstraints": {
         "unique_team_invite": {
           "name": "unique_team_invite",
-          "columns": [
-            "team_id",
-            "email"
-          ],
+          "columns": ["team_id", "email"],
           "nullsNotDistinct": false
         },
         "user_invites_code_key": {
           "name": "user_invites_code_key",
-          "columns": [
-            "code"
-          ],
+          "columns": ["code"],
           "nullsNotDistinct": false
         }
       },
@@ -9840,26 +9330,18 @@
         "users_id_fkey": {
           "name": "users_id_fkey",
           "tableFrom": "users",
-          "columnsFrom": [
-            "id"
-          ],
+          "columnsFrom": ["id"],
           "tableTo": "auth_users",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "users_team_id_fkey": {
           "name": "users_team_id_fkey",
           "tableFrom": "users",
-          "columnsFrom": [
-            "team_id"
-          ],
+          "columnsFrom": ["team_id"],
           "tableTo": "teams",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "set null"
         }
@@ -9946,26 +9428,18 @@
         "users_on_team_team_id_fkey": {
           "name": "users_on_team_team_id_fkey",
           "tableFrom": "users_on_team",
-          "columnsFrom": [
-            "team_id"
-          ],
+          "columnsFrom": ["team_id"],
           "tableTo": "teams",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "cascade",
           "onDelete": "cascade"
         },
         "users_on_team_user_id_fkey": {
           "name": "users_on_team_user_id_fkey",
           "tableFrom": "users_on_team",
-          "columnsFrom": [
-            "user_id"
-          ],
+          "columnsFrom": ["user_id"],
           "tableTo": "users",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -9973,11 +9447,7 @@
       "compositePrimaryKeys": {
         "members_pkey": {
           "name": "members_pkey",
-          "columns": [
-            "user_id",
-            "team_id",
-            "id"
-          ]
+          "columns": ["user_id", "team_id", "id"]
         }
       },
       "uniqueConstraints": {},
@@ -10001,46 +9471,27 @@
     "public.accounting_provider": {
       "name": "accounting_provider",
       "schema": "public",
-      "values": [
-        "xero",
-        "quickbooks",
-        "fortnox"
-      ]
+      "values": ["xero", "quickbooks", "fortnox"]
     },
     "public.accounting_sync_status": {
       "name": "accounting_sync_status",
       "schema": "public",
-      "values": [
-        "synced",
-        "failed",
-        "pending",
-        "partial"
-      ]
+      "values": ["synced", "failed", "pending", "partial"]
     },
     "public.accounting_sync_type": {
       "name": "accounting_sync_type",
       "schema": "public",
-      "values": [
-        "auto",
-        "manual"
-      ]
+      "values": ["auto", "manual"]
     },
     "public.activity_source": {
       "name": "activity_source",
       "schema": "public",
-      "values": [
-        "system",
-        "user"
-      ]
+      "values": ["system", "user"]
     },
     "public.activity_status": {
       "name": "activity_status",
       "schema": "public",
-      "values": [
-        "unread",
-        "read",
-        "archived"
-      ]
+      "values": ["unread", "read", "archived"]
     },
     "public.activity_type": {
       "name": "activity_type",
@@ -10083,55 +9534,32 @@
     "public.bank_providers": {
       "name": "bank_providers",
       "schema": "public",
-      "values": [
-        "gocardless",
-        "plaid",
-        "teller",
-        "enablebanking"
-      ]
+      "values": ["gocardless", "plaid", "teller", "enablebanking"]
     },
     "public.connection_status": {
       "name": "connection_status",
       "schema": "public",
-      "values": [
-        "disconnected",
-        "connected",
-        "unknown"
-      ]
+      "values": ["disconnected", "connected", "unknown"]
     },
     "public.document_processing_status": {
       "name": "document_processing_status",
       "schema": "public",
-      "values": [
-        "pending",
-        "processing",
-        "completed",
-        "failed"
-      ]
+      "values": ["pending", "processing", "completed", "failed"]
     },
     "public.inbox_account_providers": {
       "name": "inbox_account_providers",
       "schema": "public",
-      "values": [
-        "gmail",
-        "outlook"
-      ]
+      "values": ["gmail", "outlook"]
     },
     "public.inbox_account_status": {
       "name": "inbox_account_status",
       "schema": "public",
-      "values": [
-        "connected",
-        "disconnected"
-      ]
+      "values": ["connected", "disconnected"]
     },
     "public.inbox_blocklist_type": {
       "name": "inbox_blocklist_type",
       "schema": "public",
-      "values": [
-        "email",
-        "domain"
-      ]
+      "values": ["email", "domain"]
     },
     "public.inbox_status": {
       "name": "inbox_status",
@@ -10152,57 +9580,32 @@
     "public.inbox_type": {
       "name": "inbox_type",
       "schema": "public",
-      "values": [
-        "invoice",
-        "expense",
-        "other"
-      ]
+      "values": ["invoice", "expense", "other"]
     },
     "public.insight_period_type": {
       "name": "insight_period_type",
       "schema": "public",
-      "values": [
-        "weekly",
-        "monthly",
-        "quarterly",
-        "yearly"
-      ]
+      "values": ["weekly", "monthly", "quarterly", "yearly"]
     },
     "public.insight_status": {
       "name": "insight_status",
       "schema": "public",
-      "values": [
-        "pending",
-        "generating",
-        "completed",
-        "failed"
-      ]
+      "values": ["pending", "generating", "completed", "failed"]
     },
     "public.institution_status": {
       "name": "institution_status",
       "schema": "public",
-      "values": [
-        "active",
-        "removed"
-      ]
+      "values": ["active", "removed"]
     },
     "public.invoice_delivery_type": {
       "name": "invoice_delivery_type",
       "schema": "public",
-      "values": [
-        "create",
-        "create_and_send",
-        "scheduled"
-      ]
+      "values": ["create", "create_and_send", "scheduled"]
     },
     "public.invoice_recurring_end_type": {
       "name": "invoice_recurring_end_type",
       "schema": "public",
-      "values": [
-        "never",
-        "on_date",
-        "after_count"
-      ]
+      "values": ["never", "on_date", "after_count"]
     },
     "public.invoice_recurring_frequency": {
       "name": "invoice_recurring_frequency",
@@ -10222,20 +9625,12 @@
     "public.invoice_recurring_status": {
       "name": "invoice_recurring_status",
       "schema": "public",
-      "values": [
-        "active",
-        "paused",
-        "completed",
-        "canceled"
-      ]
+      "values": ["active", "paused", "completed", "canceled"]
     },
     "public.invoice_size": {
       "name": "invoice_size",
       "schema": "public",
-      "values": [
-        "a4",
-        "letter"
-      ]
+      "values": ["a4", "letter"]
     },
     "public.invoice_status": {
       "name": "invoice_status",
@@ -10253,21 +9648,12 @@
     "public.plans": {
       "name": "plans",
       "schema": "public",
-      "values": [
-        "trial",
-        "starter",
-        "pro"
-      ]
+      "values": ["trial", "starter", "pro"]
     },
     "public.platform_provider": {
       "name": "platform_provider",
       "schema": "public",
-      "values": [
-        "slack",
-        "telegram",
-        "whatsapp",
-        "sendblue"
-      ]
+      "values": ["slack", "telegram", "whatsapp", "sendblue"]
     },
     "public.reportTypes": {
       "name": "reportTypes",
@@ -10286,27 +9672,17 @@
     "public.subscription_status": {
       "name": "subscription_status",
       "schema": "public",
-      "values": [
-        "active",
-        "past_due",
-        "trialing"
-      ]
+      "values": ["active", "past_due", "trialing"]
     },
     "public.teamRoles": {
       "name": "teamRoles",
       "schema": "public",
-      "values": [
-        "owner",
-        "member"
-      ]
+      "values": ["owner", "member"]
     },
     "public.trackerStatus": {
       "name": "trackerStatus",
       "schema": "public",
-      "values": [
-        "in_progress",
-        "completed"
-      ]
+      "values": ["in_progress", "completed"]
     },
     "public.transaction_frequency": {
       "name": "transaction_frequency",

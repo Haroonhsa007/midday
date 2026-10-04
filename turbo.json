@@ -98,7 +98,9 @@
         "STORAGE_PUBLIC_ENDPOINT",
         "STORAGE_ACCESS_KEY_ID",
         "STORAGE_SECRET_ACCESS_KEY",
-        "STORAGE_FORCE_PATH_STYLE"
+        "STORAGE_FORCE_PATH_STYLE",
+        "MFA_TEST_DATABASE_URL",
+        "REALTIME_TEST_DATABASE_URL"
       ]
     },
     "dev": {
