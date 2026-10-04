@@ -1,4 +1,6 @@
-import { createClient } from "@midday/supabase/client";
+"use client";
+
+import { authClient } from "@midday/auth/client";
 import { Button } from "@midday/ui/button";
 import {
   Collapsible,
@@ -10,148 +12,194 @@ import { Spinner } from "@midday/ui/spinner";
 import { CaretSortIcon } from "@radix-ui/react-icons";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import QRCode from "qrcode";
+import { useEffect, useRef, useState } from "react";
+import { mfaVerifyAction } from "@/actions/mfa-verify-action";
+import { clearAccessToken } from "@/utils/session";
 import { CopyInput } from "./copy-input";
 
-export function EnrollMFA() {
-  const supabase = createClient();
+type Props = { replace?: boolean; onDone?: () => void; onCancel?: () => void };
+
+export function EnrollMFA({ replace = false, onDone, onCancel }: Props) {
   const router = useRouter();
-  const [isValidating, setValidating] = useState(false);
-  const [isRedirecting, setIsRedirecting] = useState(false);
-  const [factorId, setFactorId] = useState<string | undefined>(undefined);
-  const [qr, setQR] = useState<string | undefined>(undefined);
-  const [secret, setSecret] = useState<string | undefined>(undefined);
-  const [error, setError] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
-
-  const onComplete = async (code: string) => {
-    setError(false);
-
-    if (!isValidating && factorId) {
-      setValidating(true);
-
-      const challenge = await supabase.auth.mfa.challenge({ factorId });
-
-      if (!challenge.data) {
-        setError(true);
-        setValidating(false);
-        return;
-      }
-
-      const verify = await supabase.auth.mfa.verify({
-        factorId,
-        challengeId: challenge.data.id,
-        code,
-      });
-
-      if (verify.data) {
-        setIsRedirecting(true);
-        router.replace("/");
-      } else {
-        setError(true);
-        setValidating(false);
-      }
-    }
-  };
+  const started = useRef(false);
+  const busy = useRef(false);
+  const [qr, setQR] = useState("");
+  const [secret, setSecret] = useState("");
+  const [backupCodes, setBackupCodes] = useState<string[]>([]);
+  const [verified, setVerified] = useState(false);
+  const [isLoading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [copied, setCopied] = useState(false);
+  const pending = useRef(false);
 
   useEffect(() => {
+    if (started.current) return;
+    started.current = true;
     async function enroll() {
-      const { data, error } = await supabase.auth.mfa.enroll({
-        factorType: "totp",
-        issuer: "app.midday.ai",
-      });
-
-      if (error || !data) {
-        setError(true);
-        return;
+      try {
+        if (replace) {
+          const disabled = await authClient.twoFactor.disable({});
+          if (disabled.error) throw new Error(disabled.error.message);
+        }
+        const result = await authClient.twoFactor.enable({});
+        if (result.error || result.data?.method !== "totp")
+          throw new Error(
+            result.error?.message ?? "Could not set up your authenticator.",
+          );
+        pending.current = true;
+        setSecret(
+          new URL(result.data.totpURI).searchParams.get("secret") ?? "",
+        );
+        setBackupCodes(result.data.backupCodes);
+        setQR(await QRCode.toDataURL(result.data.totpURI, { width: 220 }));
+      } catch (e) {
+        setError(
+          e instanceof Error
+            ? e.message
+            : "Could not set up your authenticator.",
+        );
+      } finally {
+        setLoading(false);
       }
-
-      setFactorId(data.id);
-
-      setQR(data.totp.qr_code);
-      setSecret(data.totp.secret);
     }
+    void enroll();
+  }, [replace]);
 
-    enroll();
-  }, []);
-
-  const handleOnCancel = () => {
-    if (factorId) {
-      supabase.auth.mfa.unenroll({
-        factorId,
-      });
+  const finish = () => {
+    clearAccessToken();
+    if (onDone) onDone();
+    else {
+      router.replace("/");
+      router.refresh();
     }
-    router.push("/");
   };
+  const onComplete = async (code: string) => {
+    if (busy.current || !pending.current) return;
+    busy.current = true;
+    setLoading(true);
+    setError("");
+    try {
+      const result = await mfaVerifyAction({ method: "totp", code });
+      if (!result?.data?.verified)
+        throw new Error(
+          result?.serverError ?? "Invalid code. Please try again.",
+        );
+      pending.current = false;
+      clearAccessToken();
+      setVerified(true);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not verify the code.");
+    } finally {
+      busy.current = false;
+      setLoading(false);
+    }
+  };
+  const cancel = async () => {
+    if (isLoading || busy.current) return;
+    setLoading(true);
+    if (pending.current && !verified)
+      await authClient.twoFactor.disable({}).catch(() => undefined);
+    clearAccessToken();
+    if (onCancel) onCancel();
+    else router.push("/");
+  };
+
+  if (verified)
+    return (
+      <div className="space-y-4">
+        <h2 className="text-xl font-serif">Save your backup codes</h2>
+        <p className="text-sm text-muted-foreground">
+          Each code can be used once if you lose your authenticator. Save them
+          somewhere safe before continuing.
+        </p>
+        <div className="grid grid-cols-2 gap-2 border p-4 font-mono text-sm">
+          {backupCodes.map((code) => (
+            <span key={code}>{code}</span>
+          ))}
+        </div>
+        <Button
+          variant="outline"
+          className="w-full"
+          onClick={async () => {
+            try {
+              await navigator.clipboard.writeText(backupCodes.join("\n"));
+              setCopied(true);
+            } catch {
+              setError("Could not copy. Please save the codes manually.");
+            }
+          }}
+        >
+          {copied ? "Copied" : "Copy backup codes"}
+        </Button>
+        {error && (
+          <p role="alert" className="text-sm text-destructive">
+            {error}
+          </p>
+        )}
+        <Button className="w-full" onClick={finish}>
+          I saved my backup codes
+        </Button>
+      </div>
+    );
 
   return (
     <>
       <div className="flex items-center justify-center">
         <div className="w-[220px] h-[220px] bg-white rounded-md">
           {qr && (
-            <Image src={qr} alt="qr" width={220} height={220} quality={100} />
-          )}
-        </div>
-      </div>
-      <div className="my-8">
-        <p className="font-medium pb-1 text-2xl text-[#606060]">
-          Use an authenticator app to scan the following QR code, and provide
-          the code to complete the setup.
-        </p>
-      </div>
-
-      <Collapsible
-        open={isOpen}
-        onOpenChange={setIsOpen}
-        className="w-full mb-4"
-      >
-        <CollapsibleTrigger className="p-0 text-sm w-full">
-          <div className="flex items-center justify-between">
-            <span className="font-medium">Use setup key</span>
-            <CaretSortIcon className="h-4 w-4" />
-          </div>
-        </CollapsibleTrigger>
-        <CollapsibleContent>
-          {secret && <CopyInput value={secret} className="w-full" />}
-        </CollapsibleContent>
-      </Collapsible>
-
-      <div className="flex w-full">
-        <div className="w-full h-16 flex items-center justify-center">
-          {isValidating || isRedirecting ? (
-            <div className="flex items-center justify-center h-full bg-background/95 border border-input w-full">
-              <div className="flex items-center space-x-2 bg-background px-4 py-2 rounded-md shadow-sm">
-                <Spinner size={16} className="text-primary" />
-                <span className="text-sm text-foreground font-medium">
-                  {isRedirecting ? "Redirecting..." : "Setting up..."}
-                </span>
-              </div>
-            </div>
-          ) : (
-            <InputOTP
-              className={error ? "invalid" : ""}
-              maxLength={6}
-              autoFocus
-              onComplete={onComplete}
-              disabled={isValidating || isRedirecting}
-              render={({ slots }) => (
-                <InputOTPGroup>
-                  {slots.map((slot, index) => (
-                    <InputOTPSlot key={index.toString()} {...slot} />
-                  ))}
-                </InputOTPGroup>
-              )}
+            <Image
+              src={qr}
+              alt="Authenticator setup QR code"
+              width={220}
+              height={220}
+              unoptimized
             />
           )}
         </div>
       </div>
-
-      <div className="flex border-t-[1px] pt-4 mt-6 justify-center mb-6">
-        <Button
-          onClick={handleOnCancel}
-          variant="ghost"
-          className="text-medium text-sm hover:bg-transparent"
-        >
+      <p className="my-6 text-sm text-muted-foreground">
+        Scan this QR code with your authenticator app, then enter its six-digit
+        code to finish setup.
+      </p>
+      {secret && (
+        <Collapsible className="w-full mb-4">
+          <CollapsibleTrigger className="p-0 text-sm w-full flex justify-between">
+            <span>Use setup key</span>
+            <CaretSortIcon className="h-4 w-4" />
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <CopyInput value={secret} />
+          </CollapsibleContent>
+        </Collapsible>
+      )}
+      <div className="flex justify-center py-3">
+        {isLoading ? (
+          <Spinner size={20} />
+        ) : (
+          <InputOTP
+            aria-label="Authenticator code"
+            maxLength={6}
+            autoFocus
+            onComplete={onComplete}
+            disabled={!qr}
+            render={({ slots }) => (
+              <InputOTPGroup>
+                {slots.map((slot, index) => (
+                  <InputOTPSlot key={index.toString()} {...slot} />
+                ))}
+              </InputOTPGroup>
+            )}
+          />
+        )}
+      </div>
+      {error && (
+        <p role="alert" className="text-sm text-destructive mt-3">
+          {error}
+        </p>
+      )}
+      <div className="flex border-t pt-4 mt-6 justify-center">
+        <Button onClick={cancel} disabled={isLoading} variant="ghost">
           Cancel
         </Button>
       </div>

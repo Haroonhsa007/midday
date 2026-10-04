@@ -4,8 +4,9 @@ import * as s from "@midday/db/schema";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
-import { emailOTP, jwt } from "better-auth/plugins";
+import { emailOTP, jwt, twoFactor } from "better-auth/plugins";
 import { onUserCreated } from "./hooks";
+import { mfaEnforcement } from "./mfa";
 import { socialProvidersConfig } from "./providers";
 import { sendSignInOtp } from "./send-otp";
 
@@ -66,6 +67,12 @@ export const auth = betterAuth({
         }),
       },
     }),
+    twoFactor({
+      issuer: process.env.AUTH_TOTP_ISSUER ?? "Midday",
+      allowPasswordless: true,
+      skipVerificationOnEnable: false,
+    }),
+    mfaEnforcement(primaryDb),
     nextCookies(),
   ],
 });

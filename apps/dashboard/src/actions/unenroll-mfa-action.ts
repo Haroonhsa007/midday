@@ -1,28 +1,16 @@
 "use server";
 
+import { auth } from "@midday/auth/server";
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 import { z } from "zod";
 import { authActionClient } from "./safe-action";
 
 export const unenrollMfaAction = authActionClient
-  .schema(
-    z.object({
-      factorId: z.string(),
-    }),
-  )
-  .metadata({
-    name: "unenroll-mfa",
-  })
-  .action(async ({ parsedInput: { factorId }, ctx: { supabase } }) => {
-    const { data, error } = await supabase.auth.mfa.unenroll({
-      factorId,
-    });
-
-    if (error) {
-      throw Error(error.message);
-    }
-
+  .schema(z.object({}))
+  .metadata({ name: "unenroll-mfa" })
+  .action(async () => {
+    await auth.api.disableTwoFactor({ body: {}, headers: await headers() });
     revalidatePath("/account/security");
-
-    return data;
+    return { disabled: true };
   });

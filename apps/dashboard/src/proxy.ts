@@ -12,7 +12,10 @@ const I18nMiddleware = createI18nMiddleware({
 
 export async function proxy(request: NextRequest) {
   const response = I18nMiddleware(request);
-  const session = await auth.api.getSession({ headers: request.headers });
+  const session = await auth.api.getSession({
+    headers: request.headers,
+    query: { disableCookieCache: true },
+  });
   const isAuthenticated = !!session;
 
   const nextUrl = request.nextUrl;
@@ -51,6 +54,16 @@ export async function proxy(request: NextRequest) {
   }
 
   if (isAuthenticated) {
+    if (
+      session.user.twoFactorEnabled &&
+      session.session.aal !== "aal2" &&
+      newUrl.pathname !== "/mfa/verify"
+    ) {
+      const mfaUrl = new URL("/mfa/verify", ORIGIN);
+      if (encodedSearchParams)
+        mfaUrl.searchParams.set("return_to", encodedSearchParams);
+      return NextResponse.redirect(mfaUrl);
+    }
     if (newUrl.pathname !== "/onboarding" && newUrl.pathname !== "/teams") {
       const inviteCodeMatch = newUrl.pathname.startsWith("/teams/invite/");
 
@@ -58,8 +71,6 @@ export async function proxy(request: NextRequest) {
         return NextResponse.redirect(`${ORIGIN}${request.nextUrl.pathname}`);
       }
     }
-
-    // TODO(P05): replace the disabled legacy MFA gate with fresh session AAL enforcement.
   }
 
   return response;

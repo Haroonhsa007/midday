@@ -5,11 +5,7 @@ import { useToast } from "@midday/ui/use-toast";
 import { useAction } from "next-safe-action/hooks";
 import { unenrollMfaAction } from "@/actions/unenroll-mfa-action";
 
-type Props = {
-  factorId: string;
-};
-
-export function RemoveMFAButton({ factorId }: Props) {
+export function RemoveMFAButton() {
   const { toast } = useToast();
 
   const unenroll = useAction(unenrollMfaAction, {
@@ -23,7 +19,7 @@ export function RemoveMFAButton({ factorId }: Props) {
   });
 
   return (
-    <Button variant="outline" onClick={() => unenroll.execute({ factorId })}>
+    <Button variant="outline" onClick={() => unenroll.execute({})}>
       Remove
     </Button>
   );
