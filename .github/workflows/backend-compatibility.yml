@@ -95,10 +95,11 @@ jobs:
           bun run db:migrate 2>&1 | tee test-results/ci/migrate-first.log
           bun run db:migrate 2>&1 | tee test-results/ci/migrate-second.log
 
-      - name: Build required workbench outputs
+      - name: Build required workspace outputs
         run: |
           bun run --cwd packages/workbench build:ui
           bun run --cwd packages/workbench build:lib
+          bun run --cwd packages/mcp-apps build
 
       - name: Lint without cached results
         run: |
