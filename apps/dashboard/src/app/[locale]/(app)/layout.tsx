@@ -1,21 +1,17 @@
-import { createClient } from "@midday/supabase/server";
+import { auth } from "@midday/auth/server";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { getSession } from "@/lib/auth";
 import { isBlockedNewUser } from "@/utils/new-user-gate";
-
 export default async function AppLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = await createClient();
-  const {
-    data: { user: authUser },
-  } = await supabase.auth.getUser();
-
-  if (authUser && isBlockedNewUser(authUser.created_at)) {
-    await supabase.auth.signOut();
+  const session = await getSession();
+  if (session && isBlockedNewUser(session.user.createdAt)) {
+    await auth.api.signOut({ headers: await headers() });
     redirect("/login?waitlist=1");
   }
-
   return children;
 }

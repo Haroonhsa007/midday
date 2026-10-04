@@ -1,8 +1,9 @@
 "use server";
 
-import { createClient } from "@midday/supabase/server";
+import { auth } from "@midday/auth/server";
+import { sanitizeRedirectPath } from "@midday/utils/sanitize-redirect";
 import { addSeconds, addYears } from "date-fns";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { Cookies } from "@/utils/constants";
@@ -19,25 +20,22 @@ export const verifyOtpAction = actionClient
     }),
   )
   .action(async ({ parsedInput: { email, token, redirectTo } }) => {
-    const supabase = await createClient();
-
-    await supabase.auth.verifyOtp({
-      email,
-      token,
-      type: "email",
+    const result = await auth.api.signInEmailOTP({
+      body: { email, otp: token },
+      headers: await headers(),
     });
-
-    // Validate that the session was actually established (similar to OAuth callback)
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-
-    if (!session) {
+    if (!result.user)
       throw new Error("Failed to establish session after OTP verification");
-    }
-
-    if (isBlockedNewUser(session.user.created_at)) {
-      await supabase.auth.signOut();
+    if (isBlockedNewUser(result.user.createdAt)) {
+      const freshHeaders = new Headers(await headers());
+      freshHeaders.set(
+        "cookie",
+        (await cookies())
+          .getAll()
+          .map(({ name, value }) => `${name}=${value}`)
+          .join("; "),
+      );
+      await auth.api.signOut({ headers: freshHeaders });
       redirect(`${getUrl()}/login?waitlist=1`);
     }
 
@@ -56,5 +54,5 @@ export const verifyOtpAction = actionClient
       sameSite: "lax",
     });
 
-    redirect(redirectTo);
+    redirect(sanitizeRedirectPath(redirectTo));
   });

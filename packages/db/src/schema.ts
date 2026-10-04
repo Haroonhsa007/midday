@@ -1867,6 +1867,138 @@ export const transactionEnrichments = pgTable(
   ],
 );
 
+export const authUsers = pgTable("auth_users", {
+  id: uuid("id").default(sql`pg_catalog.gen_random_uuid()`).primaryKey(),
+  name: text("name").default("").notNull(),
+  email: text("email").notNull().unique(),
+  emailVerified: boolean("email_verified").default(false).notNull(),
+  image: text("image"),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .defaultNow()
+    .$onUpdate(() => new Date())
+    .notNull(),
+  twoFactorEnabled: boolean("two_factor_enabled").default(false),
+});
+
+export const authSessions = pgTable(
+  "auth_sessions",
+  {
+    id: uuid("id").default(sql`pg_catalog.gen_random_uuid()`).primaryKey(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    token: text("token").notNull().unique(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+    ipAddress: text("ip_address"),
+    userAgent: text("user_agent"),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => authUsers.id, { onDelete: "cascade" }),
+    aal: text("aal").default("aal1").notNull(),
+  },
+  (table) => [index("session_userId_idx").on(table.userId)],
+);
+
+export const authAccounts = pgTable(
+  "auth_accounts",
+  {
+    id: uuid("id").default(sql`pg_catalog.gen_random_uuid()`).primaryKey(),
+    accountId: text("account_id").notNull(),
+    providerId: text("provider_id").notNull(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => authUsers.id, { onDelete: "cascade" }),
+    accessToken: text("access_token"),
+    refreshToken: text("refresh_token"),
+    idToken: text("id_token"),
+    accessTokenExpiresAt: timestamp("access_token_expires_at", {
+      withTimezone: true,
+    }),
+    refreshTokenExpiresAt: timestamp("refresh_token_expires_at", {
+      withTimezone: true,
+    }),
+    scope: text("scope"),
+    password: text("password"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    index("account_userId_idx").on(table.userId),
+    uniqueIndex("auth_accounts_provider_account_key").on(
+      table.providerId,
+      table.accountId,
+    ),
+  ],
+);
+
+export const authVerifications = pgTable(
+  "auth_verifications",
+  {
+    id: uuid("id").default(sql`pg_catalog.gen_random_uuid()`).primaryKey(),
+    identifier: text("identifier").notNull(),
+    value: text("value").notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [index("verification_identifier_idx").on(table.identifier)],
+);
+
+export const authJwks = pgTable("auth_jwks", {
+  id: uuid("id").default(sql`pg_catalog.gen_random_uuid()`).primaryKey(),
+  publicKey: text("public_key").notNull(),
+  privateKey: text("private_key").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }),
+  alg: text("alg"),
+  crv: text("crv"),
+});
+
+export const authTwoFactors = pgTable(
+  "auth_two_factors",
+  {
+    id: uuid("id").default(sql`pg_catalog.gen_random_uuid()`).primaryKey(),
+    secret: text("secret").notNull(),
+    backupCodes: text("backup_codes").notNull(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => authUsers.id, { onDelete: "cascade" }),
+    verified: boolean("verified").default(true),
+    failedVerificationCount: integer("failed_verification_count").default(0),
+    lockedUntil: timestamp("locked_until", { withTimezone: true }),
+  },
+  (table) => [
+    index("twoFactor_secret_idx").on(table.secret),
+    uniqueIndex("auth_two_factors_user_id_key").on(table.userId),
+  ],
+);
+
+export const authRateLimits = pgTable("auth_rate_limits", {
+  id: uuid("id").default(sql`pg_catalog.gen_random_uuid()`).primaryKey(),
+  key: text("key").notNull().unique(),
+  count: integer("count").notNull(),
+  lastRequest: bigint("last_request", { mode: "number" }).notNull(),
+});
+
 export const users = pgTable(
   "users",
   {
@@ -1887,6 +2019,11 @@ export const users = pgTable(
     dateFormat: text("date_format"),
   },
   (table) => [
+    foreignKey({
+      columns: [table.id],
+      foreignColumns: [authUsers.id],
+      name: "users_id_fkey",
+    }).onDelete("cascade"),
     index("users_team_id_idx").using(
       "btree",
       table.teamId.asc().nullsLast().op("uuid_ops"),

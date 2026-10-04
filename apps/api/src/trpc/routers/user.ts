@@ -1,6 +1,5 @@
 import { updateUserSchema } from "@api/schemas/users";
 import { resend } from "@api/services/resend";
-import { createAdminClient } from "@api/services/supabase";
 import { createTRPCRouter, protectedProcedure } from "@api/trpc/init";
 import { withRetryOnPrimary } from "@api/utils/db-retry";
 import { teamCache } from "@midday/cache/team-cache";
@@ -72,15 +71,14 @@ export const userRouter = createTRPCRouter({
     }),
 
   delete: protectedProcedure.mutation(async ({ ctx: { db, session } }) => {
-    const supabaseAdmin = await createAdminClient();
-
     const [data] = await Promise.all([
       deleteUser(db, session.user.id),
-      supabaseAdmin.auth.admin.deleteUser(session.user.id),
-      resend.contacts.remove({
-        email: session.user.email!,
-        audienceId: process.env.RESEND_AUDIENCE_ID!,
-      }),
+      process.env.RESEND_API_KEY && process.env.RESEND_AUDIENCE_ID
+        ? resend.contacts.remove({
+            email: session.user.email!,
+            audienceId: process.env.RESEND_AUDIENCE_ID,
+          })
+        : Promise.resolve(),
     ]);
 
     return data;

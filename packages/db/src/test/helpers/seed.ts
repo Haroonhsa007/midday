@@ -3,6 +3,7 @@ import { format, subMonths } from "date-fns";
 import { and, eq } from "drizzle-orm";
 import type { Database } from "../../client";
 import {
+  authUsers,
   bankAccounts,
   bankConnections,
   exchangeRates,
@@ -107,6 +108,9 @@ export async function seedAll(db: Database): Promise<void> {
 }
 
 async function seedUsers(db: Database): Promise<void> {
+  await db
+    .insert(authUsers)
+    .values({ id: TEST_USER_ID, name: "Test User", email: "test@midday.ai" });
   await db.insert(users).values([
     {
       id: TEST_USER_ID,

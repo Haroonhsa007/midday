@@ -198,10 +198,6 @@ describe("tRPC: user.delete", () => {
     mocks.deleteUser.mockImplementation(() =>
       Promise.resolve({ id: "test-user-id" }),
     );
-    mocks.supabaseAdminDeleteUser.mockReset();
-    mocks.supabaseAdminDeleteUser.mockImplementation(() =>
-      Promise.resolve({ data: {}, error: null }),
-    );
     mocks.resendContactsRemove.mockReset();
     mocks.resendContactsRemove.mockImplementation(() =>
       Promise.resolve({ data: {}, error: null }),
@@ -209,6 +205,10 @@ describe("tRPC: user.delete", () => {
   });
 
   test("deletes user and calls deleteUser", async () => {
+    const oldKey = process.env.RESEND_API_KEY;
+    const oldAudience = process.env.RESEND_AUDIENCE_ID;
+    process.env.RESEND_API_KEY = "local-test";
+    process.env.RESEND_AUDIENCE_ID = "local-audience";
     const caller = createCaller(createTestContext());
     const result = await caller.delete();
 
@@ -217,12 +217,27 @@ describe("tRPC: user.delete", () => {
       expect.anything(),
       "test-user-id",
     );
-    expect(mocks.supabaseAdminDeleteUser).toHaveBeenCalledWith("test-user-id");
     expect(mocks.resendContactsRemove).toHaveBeenCalledWith(
       expect.objectContaining({
         email: "test@example.com",
         audienceId: process.env.RESEND_AUDIENCE_ID,
       }),
     );
+    if (oldKey === undefined) delete process.env.RESEND_API_KEY;
+    else process.env.RESEND_API_KEY = oldKey;
+    if (oldAudience === undefined) delete process.env.RESEND_AUDIENCE_ID;
+    else process.env.RESEND_AUDIENCE_ID = oldAudience;
+  });
+  test("deletes locally without contacting an unconfigured email service", async () => {
+    const oldKey = process.env.RESEND_API_KEY;
+    delete process.env.RESEND_API_KEY;
+    try {
+      expect(await createCaller(createTestContext()).delete()).toMatchObject({
+        id: "test-user-id",
+      });
+      expect(mocks.resendContactsRemove).not.toHaveBeenCalled();
+    } finally {
+      if (oldKey !== undefined) process.env.RESEND_API_KEY = oldKey;
+    }
   });
 });

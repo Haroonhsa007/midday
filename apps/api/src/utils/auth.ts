@@ -1,65 +1,33 @@
-import { createRemoteJWKSet, type JWTPayload, jwtVerify } from "jose";
-
+import { createRemoteJWKSet, jwtVerify } from "jose";
 export type Session = {
-  user: {
-    id: string;
-    email?: string;
-    full_name?: string;
-  };
+  user: { id: string; email?: string; full_name?: string };
   teamId?: string;
+  aal?: string;
 };
-
-type SupabaseJWTPayload = JWTPayload & {
-  user_metadata?: {
-    email?: string;
-    full_name?: string;
-    [key: string]: string | undefined;
-  };
-};
-
-// Primary: verify via JWKS (asymmetric ES256/RS256). jose caches the
-// keyset in memory so only the first call hits the network.
+const issuer = process.env.AUTH_JWT_ISSUER ?? "http://localhost:3001";
 const JWKS = createRemoteJWKSet(
-  new URL(`${process.env.SUPABASE_URL}/auth/v1/.well-known/jwks.json`),
+  new URL(process.env.AUTH_JWKS_URL ?? `${issuer}/api/auth/jwks`),
 );
-
-// Fallback: HS256 shared secret for tokens issued before key rotation.
-// Remove this once the legacy JWT secret is revoked in Supabase.
-const HS256_SECRET = process.env.SUPABASE_JWT_SECRET
-  ? new TextEncoder().encode(process.env.SUPABASE_JWT_SECRET)
-  : null;
-
-function extractSession(payload: JWTPayload): Session {
-  const p = payload as SupabaseJWTPayload;
-  return {
-    user: {
-      id: p.sub!,
-      email: p.user_metadata?.email,
-      full_name: p.user_metadata?.full_name,
-    },
-  };
-}
-
 export async function verifyAccessToken(
   accessToken?: string,
 ): Promise<Session | null> {
   if (!accessToken) return null;
-
   try {
-    const { payload } = await jwtVerify(accessToken, JWKS);
-    return extractSession(payload);
+    const { payload } = await jwtVerify(accessToken, JWKS, {
+      issuer,
+      audience: process.env.AUTH_JWT_AUDIENCE ?? "midday-api",
+      algorithms: ["EdDSA"],
+    });
+    if (!payload.sub) return null;
+    return {
+      user: {
+        id: payload.sub,
+        email: typeof payload.email === "string" ? payload.email : undefined,
+        full_name: typeof payload.name === "string" ? payload.name : undefined,
+      },
+      aal: typeof payload.aal === "string" ? payload.aal : "aal1",
+    };
   } catch {
-    // JWKS verification failed -- try HS256 fallback if configured.
+    return null;
   }
-
-  if (HS256_SECRET) {
-    try {
-      const { payload } = await jwtVerify(accessToken, HS256_SECRET);
-      return extractSession(payload);
-    } catch {
-      // Both methods failed.
-    }
-  }
-
-  return null;
 }

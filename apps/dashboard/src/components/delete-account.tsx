@@ -1,7 +1,7 @@
 "use client";
 
+import { authClient } from "@midday/auth/client";
 import { LogEvents } from "@midday/events/events";
-import { createClient } from "@midday/supabase/client";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,9 +29,9 @@ import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { redirectAfterAccountDeletion } from "@/actions/revalidate-action";
 import { useTRPC } from "@/trpc/client";
+import { clearAccessToken } from "@/utils/session";
 
 export function DeleteAccount() {
-  const supabase = createClient();
   const trpc = useTRPC();
   const { track } = useOpenPanel();
 
@@ -39,7 +39,8 @@ export function DeleteAccount() {
     trpc.user.delete.mutationOptions({
       onSuccess: async () => {
         track(LogEvents.AccountDeleted.name);
-        await supabase.auth.signOut();
+        clearAccessToken();
+        await authClient.signOut().catch(() => {});
         await redirectAfterAccountDeletion();
       },
     }),

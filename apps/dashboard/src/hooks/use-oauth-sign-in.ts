@@ -1,13 +1,13 @@
 "use client";
 
+import { authClient } from "@midday/auth/client";
 import { isDesktopApp } from "@midday/desktop-client/platform";
-import { createClient } from "@midday/supabase/client";
-import type { Provider } from "@supabase/supabase-js";
+import { toast } from "@midday/ui/use-toast";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { getUrl } from "@/utils/environment";
 
-export type OAuthProvider = "google" | "apple" | "github" | "azure";
+export type OAuthProvider = "google" | "apple" | "github" | "microsoft";
 
 type ProviderConfig = {
   name: string;
@@ -38,7 +38,7 @@ const OAUTH_PROVIDERS: Record<OAuthProvider, ProviderConfig> = {
     variant: "secondary",
     supportsReturnTo: true,
   },
-  azure: {
+  microsoft: {
     name: "Microsoft",
     icon: "Microsoft",
     scopes: "email profile openid",
@@ -49,41 +49,36 @@ const OAUTH_PROVIDERS: Record<OAuthProvider, ProviderConfig> = {
 
 export function useOAuthSignIn(provider: OAuthProvider) {
   const [isLoading, setLoading] = useState(false);
-  const supabase = createClient();
   const searchParams = useSearchParams();
   const returnTo = searchParams.get("return_to");
   const config = OAUTH_PROVIDERS[provider];
 
   const handleSignIn = async () => {
-    setLoading(true);
-
-    const redirectTo = new URL("/api/auth/callback", getUrl());
-    redirectTo.searchParams.append("provider", provider);
-
-    const isDesktop = isDesktopApp();
-
-    if (isDesktop) {
-      redirectTo.searchParams.append("client", "desktop");
-    } else if (config.supportsReturnTo && returnTo) {
-      redirectTo.searchParams.append("return_to", returnTo);
+    if (isDesktopApp()) {
+      toast({
+        title: "Use email code to sign in on desktop (OAuth coming soon)",
+        variant: "error",
+      });
+      return;
     }
-
-    const queryParams = isDesktop
-      ? { ...config.queryParams, client: "desktop" }
-      : config.queryParams;
-
-    await supabase.auth.signInWithOAuth({
-      provider: provider as Provider,
-      options: {
-        redirectTo: redirectTo.toString(),
-        scopes: config.scopes,
-        queryParams,
-      },
-    });
-
-    setTimeout(() => {
+    setLoading(true);
+    const callbackURL = new URL("/api/session/post-login", getUrl());
+    callbackURL.searchParams.set("provider", provider);
+    if (returnTo) callbackURL.searchParams.set("return_to", returnTo);
+    try {
+      const { error } = await authClient.signIn.social({
+        provider,
+        callbackURL: callbackURL.toString(),
+        errorCallbackURL: "/login?error=oauth",
+      });
+      if (error)
+        toast({
+          title: error.message ?? "Unable to sign in",
+          variant: "error",
+        });
+    } finally {
       setLoading(false);
-    }, 2000);
+    }
   };
 
   return { handleSignIn, isLoading, config };

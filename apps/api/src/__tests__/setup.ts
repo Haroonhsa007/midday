@@ -1,3 +1,7 @@
+process.env.AUTH_JWKS_URL ||= "http://localhost:3001/api/auth/jwks";
+process.env.AUTH_JWT_ISSUER ||= "http://localhost:3001";
+process.env.AUTH_JWT_AUDIENCE ||= "midday-api";
+
 import { mock } from "bun:test";
 
 // Set required environment variables BEFORE any mock.module calls
@@ -1341,10 +1345,7 @@ mock.module("@api/utils/auth", () => ({
     user: {
       id: "test-user-id",
       email: "test@example.com",
-      user_metadata: {},
-      app_metadata: {},
-      aud: "authenticated",
-      created_at: new Date().toISOString(),
+      full_name: "Test User",
     },
     access_token: "test-access-token",
     token_type: "bearer",
