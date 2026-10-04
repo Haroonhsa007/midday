@@ -176,7 +176,7 @@ describe("Supabase storage compatibility", () => {
       "http://localhost/signed-supabase",
     );
     expect(downloadObject).not.toHaveBeenCalled();
-    expect(result?.body).toBe(response.body);
+    expect(result?.body).toBe(response.body!);
     expect(result?.contentType).toBe("application/pdf");
     expect(result?.size).toBe(104857600);
     expect(response.bodyUsed).toBe(false);

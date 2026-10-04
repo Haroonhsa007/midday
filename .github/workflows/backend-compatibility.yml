@@ -149,6 +149,21 @@ jobs:
         timeout-minutes: 25
         run: bun run --cwd apps/dashboard build 2>&1 | tee test-results/ci/dashboard-build.log
 
+      - name: Build default Supabase profile without local auth or storage credentials
+        timeout-minutes: 25
+        env:
+          BETTER_AUTH_SECRET: ""
+          STORAGE_ENDPOINT: ""
+          STORAGE_ACCESS_KEY_ID: ""
+          STORAGE_SECRET_ACCESS_KEY: ""
+          NEXT_PUBLIC_SUPABASE_URL: http://localhost:54321
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: build-only-public-key
+          SUPABASE_URL: http://localhost:54321
+          SUPABASE_SECRET_KEY: build-only-server-key
+        run: |
+          unset NEXT_PUBLIC_BACKEND_PROVIDER
+          bun run --cwd apps/dashboard build 2>&1 | tee test-results/ci/supabase-build.log
+
       - name: Install browser and system dependencies
         run: bunx playwright install --with-deps chromium
 
