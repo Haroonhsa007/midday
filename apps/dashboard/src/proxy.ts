@@ -1,4 +1,4 @@
-import { updateSession } from "@midday/supabase/middleware";
+import { auth } from "@midday/auth/server";
 import { type NextRequest, NextResponse } from "next/server";
 import { createI18nMiddleware } from "next-international/middleware";
 
@@ -11,14 +11,14 @@ const I18nMiddleware = createI18nMiddleware({
 });
 
 export async function proxy(request: NextRequest) {
-  const { response, isAuthenticated, supabase } = await updateSession(
-    request,
-    I18nMiddleware(request),
-  );
+  const response = I18nMiddleware(request);
+  const session = await auth.api.getSession({ headers: request.headers });
+  const isAuthenticated = !!session;
 
   const nextUrl = request.nextUrl;
 
-  const pathnameLocale = nextUrl.pathname.split("/", 2)?.[1];
+  const pathnameLocale =
+    nextUrl.pathname.split("/", 2)?.[1] === "en" ? "en" : undefined;
 
   const pathnameWithoutLocale = pathnameLocale
     ? nextUrl.pathname.slice(pathnameLocale.length + 1)
@@ -27,7 +27,7 @@ export async function proxy(request: NextRequest) {
   const newUrl = new URL(pathnameWithoutLocale || "/", ORIGIN);
 
   const encodedSearchParams = `${newUrl?.pathname?.substring(1)}${
-    newUrl.search
+    nextUrl.search
   }`;
 
   if (
@@ -59,22 +59,7 @@ export async function proxy(request: NextRequest) {
       }
     }
 
-    const { data: mfaData } =
-      await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-    if (
-      mfaData &&
-      mfaData.nextLevel === "aal2" &&
-      mfaData.nextLevel !== mfaData.currentLevel &&
-      newUrl.pathname !== "/mfa/verify"
-    ) {
-      const mfaUrl = new URL("/mfa/verify", ORIGIN);
-
-      if (encodedSearchParams) {
-        mfaUrl.searchParams.append("return_to", encodedSearchParams);
-      }
-
-      return NextResponse.redirect(mfaUrl);
-    }
+    // TODO(P05): replace the disabled legacy MFA gate with fresh session AAL enforcement.
   }
 
   return response;

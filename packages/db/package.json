@@ -37,7 +37,8 @@
     "./utils/health": "./src/utils/health.ts",
     "./utils/blocklist": "./src/utils/blocklist.ts",
     "./utils/invoice-recurring": "./src/utils/invoice-recurring.ts",
-    "./migrate": "./src/migrate.ts"
+    "./migrate": "./src/migrate.ts",
+    "./queries/users": "./src/queries/users.ts"
   },
   "dependencies": {
     "@date-fns/tz": "catalog:",

@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createClient } from "@midday/supabase/client";
+import { authClient } from "@midday/auth/client";
 import { cn } from "@midday/ui/cn";
 import {
   Form,
@@ -35,12 +35,13 @@ type Props = {
 };
 
 export function OTPSignIn({ className }: Props) {
-  const verifyOtp = useAction(verifyOtpAction);
+  const verifyOtp = useAction(verifyOtpAction, {
+    onError: () => setIsVerifying(false),
+  });
   const [isLoading, setLoading] = useState(false);
   const [isSent, setSent] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
   const [email, setEmail] = useState<string>();
-  const supabase = createClient();
   const searchParams = useSearchParams();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -55,7 +56,17 @@ export function OTPSignIn({ className }: Props) {
 
     setEmail(email);
 
-    await supabase.auth.signInWithOtp({ email });
+    const { error } = await authClient.emailOtp.sendVerificationOtp({
+      email,
+      type: "sign-in",
+    });
+    if (error) {
+      form.setError("email", {
+        message: error.message ?? "Unable to send sign-in code",
+      });
+      setLoading(false);
+      return;
+    }
 
     setSent(true);
     setLoading(false);
@@ -69,13 +80,16 @@ export function OTPSignIn({ className }: Props) {
     verifyOtp.execute({
       token,
       email,
-      redirectTo: `${window.location.origin}/${searchParams.get("return_to") || ""}`,
+      redirectTo: `/api/session/post-login?provider=otp&return_to=${encodeURIComponent(searchParams.get("return_to") || "")}`,
     });
   }
 
   if (isSent) {
     return (
       <div className={cn("flex flex-col space-y-4 items-center", className)}>
+        {verifyOtp.result.serverError && (
+          <p role="alert">{verifyOtp.result.serverError}</p>
+        )}
         <div className="h-[62px] w-full flex items-center justify-center">
           {verifyOtp.isExecuting || isVerifying ? (
             <div className="flex items-center justify-center h-full bg-background/95 border border-input w-full">

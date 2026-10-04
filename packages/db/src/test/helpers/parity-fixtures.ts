@@ -1,5 +1,6 @@
 import type { Database } from "../../client";
 import {
+  authUsers,
   bankAccounts,
   customers,
   documents,
@@ -18,6 +19,9 @@ export async function seedParityFixtures(db: Database) {
   const userId = crypto.randomUUID();
   const teamA = crypto.randomUUID();
   const teamB = crypto.randomUUID();
+  await db
+    .insert(authUsers)
+    .values({ id: userId, name: "Parity User", email: "parity@example.test" });
   await db.insert(users).values({ id: userId, email: "parity@example.test" });
   await db.insert(teams).values([
     { id: teamA, name: "Team A", baseCurrency: "SEK" },

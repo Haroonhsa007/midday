@@ -1,14 +1,12 @@
-import { getSession } from "@midday/supabase/cached-queries";
 import { updateBankConnection } from "@midday/supabase/mutations";
 import { createClient } from "@midday/supabase/server";
 import { type NextRequest, NextResponse } from "next/server";
+import { getSession } from "@/lib/auth";
 import { getUrl } from "@/utils/environment";
 
 export async function GET(req: NextRequest) {
   const origin = getUrl();
-  const {
-    data: { session },
-  } = await getSession();
+  const session = await getSession();
 
   if (!session) {
     return NextResponse.redirect(new URL("/", origin));

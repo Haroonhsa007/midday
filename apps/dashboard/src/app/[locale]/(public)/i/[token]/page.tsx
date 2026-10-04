@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import type { SearchParams } from "nuqs";
 import { InvoiceViewWrapper } from "@/components/invoice-view-wrapper";
+import { getSession } from "@/lib/auth";
 import { getQueryClient, trpc } from "@/trpc/server";
 
 export async function generateMetadata(props: {
@@ -79,14 +80,11 @@ async function updateInvoiceViewedAt(id: string) {
 
 export default async function Page(props: Props) {
   const params = await props.params;
-  const supabase = await createClient({ admin: true });
   const searchParams = await props.searchParams;
   const viewerParam = searchParams?.viewer as string | undefined;
   const viewer = viewerParam ? decodeURIComponent(viewerParam) : undefined;
 
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
+  const session = await getSession();
 
   const queryClient = getQueryClient();
 
