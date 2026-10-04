@@ -94,6 +94,12 @@
     },
     "typecheck": {
       "outputs": []
+    },
+    "db:migrate": {
+      "cache": false
+    },
+    "db:generate": {
+      "cache": false
     }
   }
 }
