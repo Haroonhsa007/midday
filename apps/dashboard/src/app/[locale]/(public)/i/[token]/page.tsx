@@ -1,6 +1,4 @@
-import { decrypt } from "@midday/encryption";
 import { HtmlTemplate } from "@midday/invoice/templates/html";
-import { createClient } from "@midday/supabase/server";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import type { SearchParams } from "nuqs";
@@ -67,22 +65,11 @@ type Props = {
   searchParams: Promise<SearchParams>;
 };
 
-async function updateInvoiceViewedAt(id: string) {
-  const supabase = await createClient({ admin: true });
-
-  await supabase
-    .from("invoices")
-    .update({
-      viewed_at: new Date().toISOString(),
-    })
-    .eq("id", id);
-}
-
 export default async function Page(props: Props) {
   const params = await props.params;
   const searchParams = await props.searchParams;
   const viewerParam = searchParams?.viewer as string | undefined;
-  const viewer = viewerParam ? decodeURIComponent(viewerParam) : undefined;
+  const viewer = viewerParam;
 
   const session = await getSession();
 
@@ -91,26 +78,12 @@ export default async function Page(props: Props) {
   const invoice = await queryClient.fetchQuery(
     trpc.invoice.getInvoiceByToken.queryOptions({
       token: params.token,
+      viewer,
     }),
   );
 
   if (!invoice) {
     notFound();
-  }
-
-  if (viewer && viewer.trim().length > 0) {
-    try {
-      const decryptedEmail = decrypt(viewer);
-
-      if (decryptedEmail === invoice?.customer?.email) {
-        // Only update the invoice viewed_at if the user is a viewer
-        // Fire and forget - don't block the page render
-        updateInvoiceViewedAt(invoice.id!).catch(() => {});
-      }
-    } catch (_error) {
-      // Silently fail if decryption fails - viewer might be invalid or malformed
-      // This is expected when accessing the invoice without a valid viewer parameter
-    }
   }
 
   // If the invoice is draft and the user is not logged in, return 404 or if the invoice is not found

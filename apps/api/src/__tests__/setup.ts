@@ -91,6 +91,14 @@ export function asMock(fn: (...args: any[]) => any): MockFn {
 
 // Create reusable mock functions that tests can access
 export const mocks = {
+  verifyInvoiceToken: mock(() => ({
+    id: "invoice-123",
+    teamId: "test-team-id",
+  })) as MockFn,
+  markInvoiceViewed: mock(() =>
+    Promise.resolve({ id: "invoice-123" }),
+  ) as MockFn,
+  updateBankConnectionExpiry: mock(() => Promise.resolve(undefined)) as MockFn,
   // Transaction queries
   getTransactions: mock(() => ({
     data: [],
@@ -840,6 +848,8 @@ const dbQueriesMock = new Proxy(
     // Invoice functions
     getInvoices: mocks.getInvoices,
     getInvoiceById: mocks.getInvoiceById,
+    markInvoiceViewed: mocks.markInvoiceViewed,
+    updateBankConnectionExpiry: mocks.updateBankConnectionExpiry,
     createInvoice: mocks.createInvoice,
     updateInvoice: mocks.updateInvoice,
     deleteInvoice: mocks.deleteInvoice,
@@ -1285,7 +1295,7 @@ mock.module("@midday/invoice/utils", () => ({
 }));
 
 mock.module("@midday/invoice/token", () => ({
-  verify: mock(() => ({ id: "invoice-123", teamId: "test-team-id" })),
+  verify: mocks.verifyInvoiceToken,
 }));
 
 mock.module("@midday/invoice", () => ({
