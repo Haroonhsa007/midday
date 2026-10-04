@@ -38,7 +38,8 @@
     "./utils/blocklist": "./src/utils/blocklist.ts",
     "./utils/invoice-recurring": "./src/utils/invoice-recurring.ts",
     "./migrate": "./src/migrate.ts",
-    "./queries/users": "./src/queries/users.ts"
+    "./queries/users": "./src/queries/users.ts",
+    "./ssl": "./src/ssl.ts"
   },
   "dependencies": {
     "@date-fns/tz": "catalog:",

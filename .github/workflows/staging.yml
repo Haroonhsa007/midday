@@ -21,6 +21,7 @@ jobs:
   # Detect which services are affected (turbo dependency graph)
   # ---------------------------------------------------------------------------
   detect-changes:
+    if: github.repository == 'midday-ai/midday'
     name: Detect changes
     runs-on: blacksmith-2vcpu-ubuntu-2404
     timeout-minutes: 5

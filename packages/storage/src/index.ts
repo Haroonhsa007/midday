@@ -9,8 +9,8 @@ export type { Body, ObjectInfo } from "./s3-operations";
 /** Load only the selected provider; Supabase deployments do not need S3 credentials. */
 async function backend() {
   return isLocalBackend()
-    ? import("./s3-operations")
-    : import("./supabase-operations");
+    ? import("./s3-operations.js")
+    : import("./supabase-operations.js");
 }
 export async function upload(
   bucket: Bucket,
@@ -80,7 +80,7 @@ export async function createSignedUploadUrl(
 ): Promise<{ url: string; method: "PUT"; headers: Record<string, string> }> {
   if (!isLocalBackend())
     throw new Error("Presigned PUT uploads require the local storage provider");
-  return (await import("./s3-operations")).createSignedUploadUrl(
+  return (await import("./s3-operations.js")).createSignedUploadUrl(
     bucket,
     normalizeKey(key),
     options,
