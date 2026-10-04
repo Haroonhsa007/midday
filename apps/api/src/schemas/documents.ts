@@ -130,7 +130,7 @@ export const processDocumentSchema = z.array(
 
 export const signedUrlSchema = z.object({
   filePath: z.string(),
-  expireIn: z.number(),
+  expireIn: z.number().int().min(1).max(604800),
 });
 
 export const signedUrlsSchema = z.array(z.string());
@@ -167,7 +167,7 @@ export const preSignedUrlResponseSchema = z.object({
     description:
       "Pre-signed URL for accessing the document, valid for 60 seconds",
     example:
-      "https://service.midday.ai/storage/v1/object/sign/vault/documents/2024/invoice.pdf?token=abc123&expires=1640995200",
+      "https://storage.example.com/vault/documents/2024/invoice.pdf?token=abc123&expires=1640995200",
   }),
   expiresAt: z.string().datetime().openapi({
     description: "ISO 8601 timestamp when the URL expires",

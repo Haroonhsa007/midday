@@ -10,6 +10,7 @@
 import { Provider } from "@midday/banking";
 import { checkHealth as checkCacheHealth } from "@midday/cache/health";
 import { checkHealth as checkDbHealth } from "@midday/db/utils/health";
+import { checkStorageHealth } from "@midday/storage";
 import type { Dependency } from "./registry";
 
 // ---------------------------------------------------------------------------
@@ -39,6 +40,20 @@ export function redisCacheProbe(): Dependency {
     timeoutMs: 3_000,
     probe: async () => {
       await checkCacheHealth();
+      return true;
+    },
+  };
+}
+
+/** Storage: verify that the configured private vault bucket is reachable. */
+export function storageProbe(): Dependency {
+  return {
+    name: "storage",
+    tier: 1,
+    cacheTtlMs: 30_000,
+    timeoutMs: 3_000,
+    probe: async () => {
+      await checkStorageHealth();
       return true;
     },
   };
@@ -414,6 +429,7 @@ export function apiDependencies(): Dependency[] {
     redisCacheProbe(),
     redisQueueProbe(),
     supabaseProbe(),
+    storageProbe(),
     // Tier 2 — Important
     plaidProbe(),
     gocardlessProbe(),
@@ -443,6 +459,7 @@ export function workerDependencies(): Dependency[] {
     databaseProbe(),
     redisQueueProbe(),
     supabaseProbe(),
+    storageProbe(),
     // Tier 2 — Important
     plaidProbe(),
     gocardlessProbe(),

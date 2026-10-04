@@ -63,3 +63,15 @@ templates until their replacements are implemented.
 Phase 06 connects the application to S3-compatible storage. The local stack already
 creates a private `vault` bucket and public `avatars`, `apps`, and `institution-logos`
 buckets. `institution-logos` supports the banking package's existing `R2_*` settings.
+
+## Storage
+
+MinIO provides private `vault` objects and public `avatars` and `apps` buckets.
+Server uploads register their document rows synchronously before processing starts.
+Set the `STORAGE_*` variables in the API and worker templates. Operations use
+`STORAGE_ENDPOINT`; signed URLs use `STORAGE_PUBLIC_ENDPOINT` when configured.
+The signing endpoint must be reachable by the browser and any external document
+extraction provider. External AI providers cannot fetch localhost MinIO URLs, so
+local extraction requires a reachable tunnel URL; ordinary storage uploads,
+downloads, and exports work on localhost. R2 uses the account S3 endpoint with
+region `auto` and public asset custom domains.

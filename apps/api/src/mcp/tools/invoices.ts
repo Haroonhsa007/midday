@@ -60,7 +60,12 @@ import {
 } from "../utils";
 
 function isAllowedLogoUrl(url: string): boolean {
-  return url.startsWith("https://service.midday.ai/");
+  return [
+    process.env.STORAGE_PUBLIC_URL_AVATARS,
+    process.env.LEGACY_PUBLIC_STORAGE_URL,
+  ]
+    .filter((base): base is string => Boolean(base))
+    .some((base) => url.startsWith(`${base.replace(/\/+$/, "")}/`));
 }
 
 async function embedLogoAsDataUrl(

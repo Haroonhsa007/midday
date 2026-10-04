@@ -780,10 +780,11 @@ export const mocks = {
   // Other commonly used queries
   validateAccessToken: mock(() => null) as MockFn,
   triggerJob: mock(() => ({ id: "job-123" })) as MockFn,
-  signedUrl: mock(() => ({
-    data: { signedUrl: "https://example.com/signed" },
-    error: null,
-  })) as MockFn,
+  signedUrl: mock(() =>
+    Promise.resolve("https://example.com/signed"),
+  ) as MockFn,
+  removeStorage: mock(() => Promise.resolve()) as MockFn,
+  deleteDocumentsByNames: mock(() => Promise.resolve([])) as MockFn,
   formatAmountValue: mock(
     ({ amount }: { amount: string }) => Number.parseFloat(amount) || 0,
   ) as MockFn,
@@ -910,6 +911,7 @@ const dbQueriesMock = new Proxy(
     createInbox: mocks.createInbox,
     updateInbox: mocks.updateInbox,
     deleteInbox: mocks.deleteInbox,
+    deleteDocumentsByNames: mocks.deleteDocumentsByNames,
     deleteInboxMany: mocks.deleteInboxMany,
     getInboxByStatus: mocks.getInboxByStatus,
     getInboxSearch: mocks.getInboxSearch,
@@ -1178,13 +1180,13 @@ mock.module("@midday/cache/api-key-cache", () => ({
   },
 }));
 
-// Mock @midday/supabase/storage
-mock.module("@midday/supabase/storage", () => ({
-  signedUrl: mocks.signedUrl,
-  remove: mock(() => Promise.resolve({ error: null })),
-  download: mock(() =>
-    Promise.resolve({ data: null, error: new Error("not used in tests") }),
-  ),
+// Mock server storage while keeping key authorization real.
+mock.module("@midday/storage", () => ({
+  createSignedUrl: mocks.signedUrl,
+  remove: mocks.removeStorage,
+  download: mock(() => Promise.resolve(null)),
+  getStream: mock(() => Promise.resolve(null)),
+  checkStorageHealth: mock(() => Promise.resolve()),
 }));
 
 // Mock @midday/job-client
@@ -1283,17 +1285,10 @@ mock.module("@midday/invoice", () => ({
   ),
 }));
 
-// Mock @api/services/supabase
-mock.module("@api/services/supabase", () => ({
-  createClient: mock(async () => ({})),
-  createAdminClient: mock(async () => ({
-    auth: {
-      admin: {
-        deleteUser: (...args: unknown[]) =>
-          mocks.supabaseAdminDeleteUser(...args),
-      },
-    },
-  })),
+mock.module("@api/services/storage", () => ({
+  uploadVaultObject: mock(() =>
+    Promise.resolve({ path: "test-team-id/inbox/file.pdf" }),
+  ),
 }));
 
 mock.module("@api/services/resend", () => ({
