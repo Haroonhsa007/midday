@@ -1,5 +1,6 @@
 import { UTCDate } from "@date-fns/utc";
 import { format, subMonths } from "date-fns";
+import { and, eq } from "drizzle-orm";
 import type { Database } from "../../client";
 import {
   bankAccounts,
@@ -97,8 +98,8 @@ export async function seedAll(db: Database): Promise<void> {
   await seedUsers(db);
   await seedTeams(db);
   await seedCategories(db);
-  await seedBankAccounts(db);
   await seedExchangeRates(db);
+  await seedBankAccounts(db);
   await seedInvoices(db);
   await seedRecurringInvoices(db);
   await seedTrackerData(db);
@@ -575,7 +576,7 @@ async function seedTrackerData(db: Database): Promise<void> {
 }
 
 async function seedTransactions(db: Database): Promise<void> {
-  await db.insert(transactions).values([
+  const fixtures: (typeof transactions.$inferInsert)[] = [
     // ═══════════════════════════════════════════════════════════════════════
     // JANUARY 2024 — Revenue
     // ═══════════════════════════════════════════════════════════════════════
@@ -1673,5 +1674,24 @@ async function seedTransactions(db: Database): Promise<void> {
       baseCurrency: "EUR",
       recurring: false,
     },
-  ]);
+  ];
+  await db.insert(transactions).values(fixtures);
+  // These report scenarios deliberately model persisted overrides and missing FX
+  // values. Restore them after INSERT triggers calculate the normal defaults.
+  for (const fixture of fixtures) {
+    await db
+      .update(transactions)
+      .set({
+        baseAmount: fixture.baseAmount,
+        baseCurrency: fixture.baseCurrency,
+        recurring: fixture.recurring,
+        frequency: fixture.frequency ?? null,
+      })
+      .where(
+        and(
+          eq(transactions.id, fixture.id!),
+          eq(transactions.teamId, fixture.teamId!),
+        ),
+      );
+  }
 }
