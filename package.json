@@ -6,6 +6,10 @@
     "apps/*"
   ],
   "scripts": {
+    "infra:up": "docker compose up -d --wait postgres redis minio && docker compose run --rm minio-init",
+    "infra:down": "docker compose down",
+    "infra:reset": "docker compose down -v && bun run infra:up",
+    "infra:logs": "docker compose logs -f --tail=100",
     "build": "turbo build",
     "clean": "git clean -xdf node_modules",
     "clean:workspaces": "turbo clean",
